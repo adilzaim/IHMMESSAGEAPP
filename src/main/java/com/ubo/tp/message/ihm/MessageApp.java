@@ -10,6 +10,11 @@ import main.java.com.ubo.tp.message.core.directory.WatchableDirectory;
 import main.java.com.ubo.tp.message.datamodel.Message;
 import main.java.com.ubo.tp.message.datamodel.User;
 
+import javax.swing.*;
+
+import static main.java.com.ubo.tp.message.ihm.MessageAppMainView.chooseDirectoryOnStartup;
+
+
 /**
  * Classe principale l'application.
  *
@@ -46,6 +51,9 @@ public class MessageApp implements IDatabaseObserver {
 	 */
 	protected String mUiClassName;
 
+
+
+
 	/**
 	 * Constructeur.
 	 *
@@ -69,8 +77,7 @@ public class MessageApp implements IDatabaseObserver {
 		// Initialisation de l'IHM
 		this.initGui();
 
-		// Initialisation du répertoire d'échange
-		this.initDirectory();
+
 	}
 
 	/**
@@ -83,7 +90,11 @@ public class MessageApp implements IDatabaseObserver {
 	 * Initialisation de l'interface graphique.
 	 */
 	protected void initGui() {
-		// this.mMainView...
+		// Choisir un répertoire d'échange (appel à la méthode existante)
+		this.initDirectory();
+
+
+
 	}
 
 	/**
@@ -93,6 +104,18 @@ public class MessageApp implements IDatabaseObserver {
 	 * pouvoir utiliser l'application</b>
 	 */
 	protected void initDirectory() {
+		String path = chooseDirectoryOnStartup();
+	if(this.isValideExchangeDirectory(new File(path))) {
+		System.out.println("path found");
+		this.initDirectory(path);
+		mMainView = new MessageAppMainView(path);
+		mMainView.setVisible(true);
+
+	}else {
+		System.out.println("path not found");
+	}
+
+
 	}
 
 	/**
@@ -112,6 +135,7 @@ public class MessageApp implements IDatabaseObserver {
 	 * @param directoryPath
 	 */
 	protected void initDirectory(String directoryPath) {
+
 		mExchangeDirectoryPath = directoryPath;
 		mWatchableDirectory = new WatchableDirectory(directoryPath);
 		mEntityManager.setExchangeDirectory(directoryPath);
@@ -121,37 +145,37 @@ public class MessageApp implements IDatabaseObserver {
 	}
 
 	public void show() {
-		// ... setVisible?
+
 	}
 
 	@Override
 	public void notifyMessageAdded(Message addedMessage) {
-		System.out.println("Message added");
+		System.out.println("---> Message ajouté : " + addedMessage.getText());
 	}
 
 	@Override
 	public void notifyMessageDeleted(Message deletedMessage) {
-		System.out.println("Message deleted");
+		System.out.println("---> Message supprimé : " + deletedMessage.getText());
 	}
 
 	@Override
 	public void notifyMessageModified(Message modifiedMessage) {
-		System.out.println("Message modified");
-
+		System.out.println("---> Message modifié : " + modifiedMessage.getText());
 	}
 
 	@Override
 	public void notifyUserAdded(User addedUser) {
-		System.out.println("user added");
+		System.out.println("---> Utilisateur ajouté : " + addedUser.getName());
 	}
 
 	@Override
 	public void notifyUserDeleted(User deletedUser) {
-		System.out.println("user deleted");
+		System.out.println("---> Utilisateur supprimé : " + deletedUser.getName());
 	}
 
 	@Override
 	public void notifyUserModified(User modifiedUser) {
-		System.out.println("user modified");
+		System.out.println("--->Utilisateur modifié : " + modifiedUser.getName());
 	}
+
 }
