@@ -1,12 +1,9 @@
 package main.java.com.ubo.tp.message.ihm;
 
-import main.java.com.ubo.tp.message.core.EntityManager;
-import main.java.com.ubo.tp.message.core.database.Database;
-import main.java.com.ubo.tp.message.core.database.IDatabase;
+import main.java.com.ubo.tp.message.ihm.listener.ExitListener;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,6 +17,11 @@ public class MessageAppMainView extends JFrame {
 
     private String selectedDirectory; // Stocke le répertoire sélectionné
 
+    public void setListener(ExitListener exitListener) {
+        this.exitListener = exitListener;
+    }
+
+    private ExitListener exitListener;
     /**
      * Constructeur principal.
      */
@@ -77,7 +79,15 @@ public class MessageAppMainView extends JFrame {
         // Menu "Fichier"
         JMenu fileMenu = new JMenu("Fichier");
         JMenuItem exitItem = new JMenuItem("Quitter", new ImageIcon("src/main/resources/images/exitIcon_20.png"));
-        exitItem.addActionListener(e -> System.exit(0));
+        // Modification de l'action de quitter
+        exitItem.addActionListener(e -> {
+            if (exitListener != null) {
+                exitListener.onExit();
+            } else {
+                // Comportement par défaut si aucun listener n'est défini
+                System.exit(0);
+            }
+        });
         fileMenu.add(exitItem);
         menuBar.add(fileMenu);
 

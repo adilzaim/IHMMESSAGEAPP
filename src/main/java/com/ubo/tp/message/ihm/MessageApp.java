@@ -109,12 +109,21 @@ public class MessageApp implements IDatabaseObserver {
 		System.out.println("path found");
 		this.initDirectory(path);
 		mMainView = new MessageAppMainView(path);
+		mMainView.setListener(()-> doQuit());
 		mMainView.setVisible(true);
 
 	}else {
 		System.out.println("path not found");
 	}
 
+
+	}
+
+	protected void doQuit()
+
+	{
+
+			System.exit(0);
 
 	}
 
