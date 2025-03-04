@@ -10,9 +10,9 @@ import main.java.com.ubo.tp.message.core.directory.WatchableDirectory;
 import main.java.com.ubo.tp.message.datamodel.Message;
 import main.java.com.ubo.tp.message.datamodel.User;
 import main.java.com.ubo.tp.message.ihm.listener.LoginListener;
+import main.java.com.ubo.tp.message.ihm.serviceUser.Service;
 
-import javax.swing.*;
-
+import static main.java.com.ubo.tp.message.ihm.LoginView.showPopup;
 import static main.java.com.ubo.tp.message.ihm.MessageAppMainView.chooseDirectoryOnStartup;
 
 
@@ -52,7 +52,7 @@ public class MessageApp implements IDatabaseObserver {
 	 */
 	protected String mUiClassName;
 
-
+	private Service userService;
 
 
 	/**
@@ -64,6 +64,7 @@ public class MessageApp implements IDatabaseObserver {
 	public MessageApp(IDatabase database, EntityManager entityManager) {
 		this.mDatabase = database;
 		this.mEntityManager = entityManager;
+		this.userService = new Service(this.mDatabase,this.mEntityManager);
 
 	}
 
@@ -112,13 +113,13 @@ public class MessageApp implements IDatabaseObserver {
 		LoginView loginView = new LoginView();
 		loginView.setLoginListener(new LoginListener() {
 			@Override
-			public void onLoginSuccess(String username) {
-
+			public void loginVerify(String username, String tag) {
+				 doLogin(username,tag);
 			}
 
 			@Override
-			public void onLoginFailure() {
-
+			public void createUser(String name, String tag, String avatarPath) {
+				createNewUser(name,tag, avatarPath);
 			}
 		});
 		mMainView = new MessageAppMainView(path,loginView);
@@ -141,6 +142,18 @@ public class MessageApp implements IDatabaseObserver {
 
 			System.exit(0);
 
+	}
+
+	protected void doLogin(String name, String tag){
+		if(this.userService.doLogin(name,tag)) {
+			showPopup("vous etes connecté", true);
+		}else {
+			showPopup("identifiants erroné", false);
+		}
+	}
+
+	protected void createNewUser(String name, String tag , String path){
+		this.userService.createUser(name,tag,path);
 	}
 
 	/**

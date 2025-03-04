@@ -39,7 +39,7 @@ public class LoginView extends JPanel {
         // Password label and field
         gbc.gridx = 0;
         gbc.gridy = 1;
-        add(new JLabel("Mot de passe:"), gbc);
+        add(new JLabel("Tag de l'utilisateur:"), gbc);
 
         gbc.gridx = 1;
         passwordField = new JPasswordField(20);
@@ -67,21 +67,13 @@ public class LoginView extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String username = usernameField.getText();
-                String password = new String(passwordField.getPassword());
+                String tag = new String(passwordField.getPassword());
 
-                if (authenticateUser(username, password)) {
-                    if (loginListener != null) {
-                        loginListener.onLoginSuccess(username);
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(LoginView.this,
-                            "Nom d'utilisateur ou mot de passe incorrect",
-                            "Erreur de connexion",
-                            JOptionPane.ERROR_MESSAGE);
-                    if (loginListener != null) {
-                        loginListener.onLoginFailure();
-                    }
+                if (loginListener != null) {
+                    loginListener.loginVerify(username, tag);
                 }
+
+
             }
         });
 
@@ -97,7 +89,7 @@ public class LoginView extends JPanel {
         JTextField newUsernameField = new JTextField(20);
         JPasswordField newPasswordField = new JPasswordField(20);
         JPasswordField confirmPasswordField = new JPasswordField(20);
-
+        JTextField tag = new JTextField(20);
         JPanel panel = new JPanel(new GridLayout(0, 2));
         panel.add(new JLabel("Nom d'utilisateur:"));
         panel.add(newUsernameField);
@@ -105,6 +97,9 @@ public class LoginView extends JPanel {
         panel.add(newPasswordField);
         panel.add(new JLabel("Confirmer le mot de passe:"));
         panel.add(confirmPasswordField);
+        panel.add(new JLabel("Tag:"));
+        panel.add(tag);
+
 
         int result = JOptionPane.showConfirmDialog(
                 this,
@@ -117,11 +112,12 @@ public class LoginView extends JPanel {
             String newUsername = newUsernameField.getText();
             String newPassword = new String(newPasswordField.getPassword());
             String confirmPassword = new String(confirmPasswordField.getPassword());
+            String tagString = new String(tag.getText());
 
             // Validate input
-            if (newUsername.isEmpty() || newPassword.isEmpty()) {
+            if (newUsername.isEmpty() || newPassword.isEmpty() || tagString.isEmpty()) {
                 JOptionPane.showMessageDialog(this,
-                        "Tous les champs sont obligatoires",
+                        "nom utilisateur , mot de passe et tag sont obligatoires",
                         "Erreur",
                         JOptionPane.ERROR_MESSAGE);
                 return;
@@ -135,21 +131,9 @@ public class LoginView extends JPanel {
                 return;
             }
 
-            // Check if username already exists
-            if (userCredentials.containsKey(newUsername)) {
-                JOptionPane.showMessageDialog(this,
-                        "Ce nom d'utilisateur existe déjà",
-                        "Erreur",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
 
             // Add new user
-            userCredentials.put(newUsername, newPassword);
-            JOptionPane.showMessageDialog(this,
-                    "Compte créé avec succès",
-                    "Succès",
-                    JOptionPane.INFORMATION_MESSAGE);
+           this.loginListener.createUser(newUsername , newUsername ,newUsername);
         }
     }
 
@@ -161,5 +145,14 @@ public class LoginView extends JPanel {
 
     public void setLoginListener(LoginListener listener) {
         this.loginListener = listener;
+    }
+    //pop up
+
+    public static void showPopup(String message, boolean isNormal) {
+        if (isNormal) {
+            JOptionPane.showMessageDialog(null, message, "Information", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(null, message, "Erreur", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }
