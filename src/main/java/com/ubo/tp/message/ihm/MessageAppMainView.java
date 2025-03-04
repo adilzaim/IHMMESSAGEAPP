@@ -1,5 +1,6 @@
 package main.java.com.ubo.tp.message.ihm;
 
+import main.java.com.ubo.tp.message.datamodel.User;
 import main.java.com.ubo.tp.message.ihm.listener.ExitListener;
 
 import javax.swing.*;
@@ -8,6 +9,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -200,6 +203,24 @@ public class MessageAppMainView extends JFrame {
             return chooser.getSelectedFile().getAbsolutePath();
         }
         return null; // Retourne null si l'utilisateur annule
+    }
+
+    public void setUserMapView(User user) {
+        // Créer une map à partir des informations de l'utilisateur
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("Nom", user.getName());
+        userMap.put("Tag", user.getUserTag());
+        // Ajoutez d'autres informations utilisateur si nécessaire
+
+        // Créer la vue de la map utilisateur
+        UserMapView userMapView = new UserMapView(userMap);
+
+
+
+        // Remplacer le contenu actuel par la vue utilisateur
+        setContentPane(userMapView);
+        revalidate();
+        repaint();
     }
 
 }

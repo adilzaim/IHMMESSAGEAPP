@@ -16,18 +16,25 @@ public class Service {
         this.mEntityManager = entityManager;
     }
 
-    public boolean doLogin(String username, String tag) {
+    public User doLogin(String username, String tag) {
         for (User i : this.mDatabase.getUsers()) {
             if (i.getName().equals(username) && i.getUserTag().equals(tag)) {
-                return true;
+                return i;
             }
         }
-        return false;
+        return null;
     }
 
-    public void createUser(String nom, String tag, String avatarPath){
-        this.mDatabase.addUser(new User(UUID.randomUUID(), tag,"hhhh", nom,new HashSet<>() ,avatarPath));
+    public boolean createUser(String nom, String tag, String avatarPath, String password) {
+        // Vérifier si l'utilisateur existe déjà
+        boolean exists = this.mDatabase.getUsers().stream().anyMatch(i -> i.getUserTag().equals(tag));
 
+        // Si l'utilisateur n'existe pas, l'ajouter
+        if (!exists) {
+            this.mDatabase.addUser(new User(UUID.randomUUID(), tag, password, nom, new HashSet<>(), avatarPath));
+        }
+
+        return !exists;
     }
 
 

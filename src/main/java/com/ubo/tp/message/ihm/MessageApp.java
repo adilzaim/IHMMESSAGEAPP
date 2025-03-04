@@ -118,8 +118,8 @@ public class MessageApp implements IDatabaseObserver {
 			}
 
 			@Override
-			public void createUser(String name, String tag, String avatarPath) {
-				createNewUser(name,tag, avatarPath);
+			public void createUser(String name, String tag, String avatarPath ,String password) {
+				createNewUser(name,tag, avatarPath,password);
 			}
 		});
 		mMainView = new MessageAppMainView(path,loginView);
@@ -145,15 +145,18 @@ public class MessageApp implements IDatabaseObserver {
 	}
 
 	protected void doLogin(String name, String tag){
-		if(this.userService.doLogin(name,tag)) {
-			showPopup("vous etes connecté", true);
+		User user = this.userService.doLogin(name,tag);
+		if(user != null) {
+			this.mMainView.setUserMapView(user);
 		}else {
 			showPopup("identifiants erroné", false);
 		}
 	}
 
-	protected void createNewUser(String name, String tag , String path){
-		this.userService.createUser(name,tag,path);
+	protected void createNewUser(String name, String tag , String path, String password){
+		if(!(this.userService.createUser(name,tag,path, password))) showPopup("tag déja utilisé , choisisez un autre tag !", false);
+
+
 	}
 
 	/**

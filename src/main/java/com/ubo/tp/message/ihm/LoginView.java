@@ -133,7 +133,7 @@ public class LoginView extends JPanel {
 
 
             // Add new user
-           this.loginListener.createUser(newUsername , newUsername ,newUsername);
+           this.loginListener.createUser(newUsername , newUsername ,newUsername, newPassword);
         }
     }
 
