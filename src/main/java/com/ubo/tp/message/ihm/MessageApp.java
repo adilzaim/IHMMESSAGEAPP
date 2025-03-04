@@ -4,15 +4,18 @@ import java.io.File;
 
 import main.java.com.ubo.tp.message.core.EntityManager;
 import main.java.com.ubo.tp.message.core.database.IDatabase;
+import main.java.com.ubo.tp.message.core.database.IDatabaseObserver;
 import main.java.com.ubo.tp.message.core.directory.IWatchableDirectory;
 import main.java.com.ubo.tp.message.core.directory.WatchableDirectory;
+import main.java.com.ubo.tp.message.datamodel.Message;
+import main.java.com.ubo.tp.message.datamodel.User;
 
 /**
  * Classe principale l'application.
  *
  * @author S.Lucas
  */
-public class MessageApp {
+public class MessageApp implements IDatabaseObserver {
 	/**
 	 * Base de données.
 	 */
@@ -52,12 +55,14 @@ public class MessageApp {
 	public MessageApp(IDatabase database, EntityManager entityManager) {
 		this.mDatabase = database;
 		this.mEntityManager = entityManager;
+
 	}
 
 	/**
 	 * Initialisation de l'application.
 	 */
 	public void init() {
+		this.mDatabase.addObserver(this);
 		// Init du look and feel de l'application
 		this.initLookAndFeel();
 
@@ -117,5 +122,36 @@ public class MessageApp {
 
 	public void show() {
 		// ... setVisible?
+	}
+
+	@Override
+	public void notifyMessageAdded(Message addedMessage) {
+		System.out.println("Message added");
+	}
+
+	@Override
+	public void notifyMessageDeleted(Message deletedMessage) {
+		System.out.println("Message deleted");
+	}
+
+	@Override
+	public void notifyMessageModified(Message modifiedMessage) {
+		System.out.println("Message modified");
+
+	}
+
+	@Override
+	public void notifyUserAdded(User addedUser) {
+		System.out.println("user added");
+	}
+
+	@Override
+	public void notifyUserDeleted(User deletedUser) {
+		System.out.println("user deleted");
+	}
+
+	@Override
+	public void notifyUserModified(User modifiedUser) {
+		System.out.println("user modified");
 	}
 }
