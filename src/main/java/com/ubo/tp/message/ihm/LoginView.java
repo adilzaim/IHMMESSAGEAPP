@@ -3,6 +3,7 @@ package main.java.com.ubo.tp.message.ihm;
 import main.java.com.ubo.tp.message.ihm.listener.LoginListener;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -90,6 +91,26 @@ public class LoginView extends JPanel {
         JPasswordField newPasswordField = new JPasswordField(20);
         JPasswordField confirmPasswordField = new JPasswordField(20);
         JTextField tag = new JTextField(20);
+        JTextField avatarPath = new JTextField(20);
+        avatarPath.setEditable(false);
+        JButton browseButton = new JButton("Parcourir");
+
+        browseButton.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                    "Images (PNG, JPEG)", "png", "jpg", "jpeg", "jpe"
+            );
+            fileChooser.setFileFilter(filter);
+            int result = fileChooser.showOpenDialog(null);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                avatarPath.setText(fileChooser.getSelectedFile().getAbsolutePath());
+            }
+        });
+
+
+
+
+
         JPanel panel = new JPanel(new GridLayout(0, 2));
         panel.add(new JLabel("Nom d'utilisateur:"));
         panel.add(newUsernameField);
@@ -99,6 +120,9 @@ public class LoginView extends JPanel {
         panel.add(confirmPasswordField);
         panel.add(new JLabel("Tag:"));
         panel.add(tag);
+        panel.add(new JLabel("Avatar (png, jpeg):"));
+        panel.add(avatarPath);
+        panel.add(browseButton);
 
 
         int result = JOptionPane.showConfirmDialog(
@@ -113,6 +137,7 @@ public class LoginView extends JPanel {
             String newPassword = new String(newPasswordField.getPassword());
             String confirmPassword = new String(confirmPasswordField.getPassword());
             String tagString = new String(tag.getText());
+            String avatarPathString = new String(avatarPath.getText());
 
             // Validate input
             if (newUsername.isEmpty() || newPassword.isEmpty() || tagString.isEmpty()) {
@@ -133,7 +158,7 @@ public class LoginView extends JPanel {
 
 
             // Add new user
-           this.loginListener.createUser(newUsername , newUsername ,newUsername, newPassword);
+           this.loginListener.createUser(newUsername , tagString ,avatarPathString, newPassword);
         }
     }
 
