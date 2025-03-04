@@ -9,6 +9,7 @@ import main.java.com.ubo.tp.message.core.directory.IWatchableDirectory;
 import main.java.com.ubo.tp.message.core.directory.WatchableDirectory;
 import main.java.com.ubo.tp.message.datamodel.Message;
 import main.java.com.ubo.tp.message.datamodel.User;
+import main.java.com.ubo.tp.message.ihm.listener.LoginListener;
 
 import javax.swing.*;
 
@@ -108,7 +109,22 @@ public class MessageApp implements IDatabaseObserver {
 	if(this.isValideExchangeDirectory(new File(path))) {
 		System.out.println("path found");
 		this.initDirectory(path);
-		mMainView = new MessageAppMainView(path);
+		LoginView loginView = new LoginView();
+		loginView.setLoginListener(new LoginListener() {
+			@Override
+			public void onLoginSuccess(String username) {
+
+			}
+
+			@Override
+			public void onLoginFailure() {
+
+			}
+		});
+		mMainView = new MessageAppMainView(path,loginView);
+
+
+
 		mMainView.setListener(()-> doQuit());
 		mMainView.setVisible(true);
 

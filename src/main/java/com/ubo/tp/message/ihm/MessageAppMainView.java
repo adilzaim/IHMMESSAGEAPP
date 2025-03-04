@@ -22,13 +22,30 @@ public class MessageAppMainView extends JFrame {
     }
 
     private ExitListener exitListener;
+
+
+    public void setComponent(LoginView component) {
+        this.component = component;
+    }
+
+    private LoginView component;
+
+
+
+    private void initializeLoginComponent() {
+        // Définit le login comme contenu principal
+        setContentPane(component);
+    }
+
+
+
     /**
      * Constructeur principal.
      */
-    public MessageAppMainView(String directory) {
+    public MessageAppMainView(String directory, LoginView loginView) {
         super("MessageApp - " + directory);
 
-
+        this.component = loginView;
         // Chargement et définition de l'icône de l'application (conservant ta config)
         setApplicationIcon();
 
@@ -42,7 +59,7 @@ public class MessageAppMainView extends JFrame {
 
         // Ajout de la barre de menu
         setJMenuBar(createMenuBar());
-
+        initializeLoginComponent();
 
     }
 
@@ -83,9 +100,6 @@ public class MessageAppMainView extends JFrame {
         exitItem.addActionListener(e -> {
             if (exitListener != null) {
                 exitListener.onExit();
-            } else {
-                // Comportement par défaut si aucun listener n'est défini
-                System.exit(0);
             }
         });
         fileMenu.add(exitItem);
