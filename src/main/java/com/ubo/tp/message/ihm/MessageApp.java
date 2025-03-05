@@ -1,6 +1,8 @@
 package main.java.com.ubo.tp.message.ihm;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import main.java.com.ubo.tp.message.core.EntityManager;
 import main.java.com.ubo.tp.message.core.database.IDatabase;
@@ -10,6 +12,7 @@ import main.java.com.ubo.tp.message.core.directory.WatchableDirectory;
 import main.java.com.ubo.tp.message.datamodel.Message;
 import main.java.com.ubo.tp.message.datamodel.User;
 import main.java.com.ubo.tp.message.ihm.listener.LoginListener;
+import main.java.com.ubo.tp.message.ihm.messageComponent.MessageAnnouncementView;
 import main.java.com.ubo.tp.message.ihm.messageComponent.MessageController;
 import main.java.com.ubo.tp.message.ihm.messageComponent.MessagePanel;
 import main.java.com.ubo.tp.message.ihm.serviceUser.Service;
@@ -60,6 +63,7 @@ public class MessageApp implements IDatabaseObserver , UserModelObserver {
 
 	private Service userService;
 
+	private MessageAnnouncementView messageAnnouncementView;
 	private UserModel userModel;
 	/**
 	 * Constructeur.
@@ -73,6 +77,7 @@ public class MessageApp implements IDatabaseObserver , UserModelObserver {
 		this.userService = new Service(this.mDatabase,this.mEntityManager);
 		this.userModel = new UserModel();
 		this.userModel.addObserver(this);
+
 	}
 
 	/**
@@ -198,7 +203,10 @@ public class MessageApp implements IDatabaseObserver , UserModelObserver {
 
 	@Override
 	public void notifyMessageAdded(Message addedMessage) {
-		System.out.println("---> Message ajouté : " + addedMessage.getText());
+		List<Message> liste = this.userService.getMessageUser(this.userModel.getCurrentUser());
+		this.messageAnnouncementView.unsetMessageList(liste);
+		this.mMainView.setRightBottomComponent(this.messageAnnouncementView);
+		System.out.println("---> Message ajouté : " + addedMessage.toString());
 	}
 
 	@Override
@@ -213,7 +221,7 @@ public class MessageApp implements IDatabaseObserver , UserModelObserver {
 
 	@Override
 	public void notifyUserAdded(User addedUser) {
-		System.out.println("---> Utilisateur ajouté : " + addedUser.getName());
+		System.out.println("---> Utilisateur ajouté : " + addedUser.toString());
 	}
 
 	@Override
@@ -229,7 +237,8 @@ public class MessageApp implements IDatabaseObserver , UserModelObserver {
 	@Override
 	public void onUserLoggedIn(User user) {
         UserController userController = new UserController(this.userModel, this.mMainView , new UserMapView(this.userModel.getCurrentUser()));
-		MessageController messageController = new MessageController(this.userModel , new MessagePanel(this.userModel.getCurrentUser()),this.mDatabase,this.mMainView);
+		this.messageAnnouncementView = new MessageAnnouncementView(this.userService.getMessageUser(this.userModel.getCurrentUser()));
+		MessageController messageController = new MessageController(this.userModel , new MessagePanel(this.userModel.getCurrentUser()),this.mDatabase,this.mMainView,this.messageAnnouncementView);
 
     }
 

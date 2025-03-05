@@ -2,10 +2,14 @@ package main.java.com.ubo.tp.message.ihm.serviceUser;
 
 import main.java.com.ubo.tp.message.core.EntityManager;
 import main.java.com.ubo.tp.message.core.database.IDatabase;
+import main.java.com.ubo.tp.message.datamodel.Message;
 import main.java.com.ubo.tp.message.datamodel.User;
+import main.java.com.ubo.tp.message.ihm.MessageApp;
 import main.java.com.ubo.tp.message.ihm.userComponent.UserModel;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 public class Service {
@@ -37,6 +41,15 @@ public class Service {
         }
 
         return !exists;
+    }
+
+    public List<Message> getMessageUser(User user) {
+        List<Message> liste = new ArrayList<>();
+        for(Message msg : this.mDatabase.getUserMessages(user)){
+            liste.add(msg);
+        }
+        //toAddMessagesFollowing
+        return liste;
     }
 
 
