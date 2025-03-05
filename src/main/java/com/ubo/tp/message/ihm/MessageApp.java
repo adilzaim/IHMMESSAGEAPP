@@ -12,6 +12,7 @@ import main.java.com.ubo.tp.message.datamodel.User;
 import main.java.com.ubo.tp.message.ihm.listener.LoginListener;
 import main.java.com.ubo.tp.message.ihm.serviceUser.Service;
 import main.java.com.ubo.tp.message.ihm.userComponent.UserController;
+import main.java.com.ubo.tp.message.ihm.userComponent.UserMapView;
 import main.java.com.ubo.tp.message.ihm.userComponent.UserModel;
 import main.java.com.ubo.tp.message.ihm.userComponent.UserModelObserver;
 
@@ -232,6 +233,6 @@ public class MessageApp implements IDatabaseObserver , UserModelObserver {
 
 	@Override
 	public void onUserLoggedOut() {
-
+		this.mMainView.setLoginView();
 	}
 }

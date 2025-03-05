@@ -1,7 +1,6 @@
-package main.java.com.ubo.tp.message.ihm;
+package main.java.com.ubo.tp.message.ihm.userComponent;
 
 import main.java.com.ubo.tp.message.datamodel.User;
-import main.java.com.ubo.tp.message.ihm.listener.UserMapViewListener;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -9,9 +8,10 @@ import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.Map;
 
 public class UserMapView extends JPanel {
+
+
     // Map to store user information
     private User user;
 
@@ -140,6 +140,10 @@ public class UserMapView extends JPanel {
      * @param listener UserMapViewListener to handle user actions
      */
     public void setUserMapViewListener(UserMapViewListener listener) {
+        this.listener = listener;
+    }
+
+    public void setListener(UserMapViewListener listener) {
         this.listener = listener;
     }
 }

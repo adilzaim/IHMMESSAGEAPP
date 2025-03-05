@@ -1,7 +1,7 @@
 package main.java.com.ubo.tp.message.ihm;
 
-import main.java.com.ubo.tp.message.datamodel.User;
 import main.java.com.ubo.tp.message.ihm.listener.ExitListener;
+import main.java.com.ubo.tp.message.ihm.userComponent.UserMapView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -215,6 +213,12 @@ public class MessageAppMainView extends JFrame {
 
         // Remplacer le contenu actuel par la vue utilisateur
         setContentPane(userMapView);
+        revalidate();
+        repaint();
+    }
+
+    public void setLoginView(){
+        setContentPane(component);
         revalidate();
         repaint();
     }

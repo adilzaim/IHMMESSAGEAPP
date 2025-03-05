@@ -1,4 +1,4 @@
-package main.java.com.ubo.tp.message.ihm.listener;
+package main.java.com.ubo.tp.message.ihm.userComponent;
 
 public interface UserMapViewListener {
 
