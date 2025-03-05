@@ -1,12 +1,14 @@
 package main.java.com.ubo.tp.message.ihm.messageComponent;
 
 import main.java.com.ubo.tp.message.datamodel.Message;
-import main.java.com.ubo.tp.message.datamodel.User;
 
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -16,107 +18,129 @@ public class MessageAnnouncementView extends JPanel {
     private StyleContext styleContext;
     private Style baseStyle, tagStyle, timestampStyle, messageStyle;
 
-    private List<Message> messageList;
+    private List<Message> originalMessageList;
+    private List<Message> filteredMessageList;
+
+    private JTextField searchField;
+    private JButton searchButton, resetButton;
+
+    private FilterListener filterListener;
 
     public MessageAnnouncementView(List<Message> messageList) {
-        this.messageList = messageList;
+        this.originalMessageList = messageList;
+        this.filteredMessageList = new ArrayList<>(messageList);
+
         setLayout(new BorderLayout());
-
-        // Initialiser le style
         styleContext = StyleContext.getDefaultStyleContext();
-
-        // Créer les styles
         createStyles();
-
-        // Créer le document stylé
         document = new DefaultStyledDocument();
 
-        // Créer le TextPane
         messagePane = new JTextPane(document);
         messagePane.setEditable(false);
 
-        // Ajouter une barre de défilement
         JScrollPane scrollPane = new JScrollPane(messagePane);
         add(scrollPane, BorderLayout.CENTER);
 
-        // Afficher les messages
+        addSearchBar();
         displayMessages();
     }
 
-    // Fonction pour réinitialiser la liste des messages et mettre à jour l'affichage
-    public void unsetMessageList(List<Message> newMessageList) {
-        this.messageList = newMessageList;
+    private void addSearchBar() {
+        searchField = new JTextField(20);
+        searchField.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(33, 150, 243), 2, true),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)
+        ));
+
+        searchButton = new JButton("Rechercher");
+        searchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (filterListener != null) {
+                    filterListener.onFilter(searchField.getText().trim());
+                }
+            }
+        });
+
+        resetButton = new JButton("Réinitialiser");
+        resetButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                searchField.setText(""); // Efface la barre de recherche
+                if(filterListener != null) {
+                    filterListener.onFilterRemove();
+                }
+            }
+        });
+
+        JPanel searchPanel = new JPanel(new BorderLayout());
+        searchPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        searchPanel.setBackground(Color.WHITE);
+
+        JPanel searchContainer = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        searchContainer.add(searchField);
+        searchContainer.add(searchButton);
+        searchContainer.add(resetButton);
+        searchContainer.setBackground(Color.WHITE);
+
+        searchPanel.add(searchContainer, BorderLayout.WEST);
+        add(searchPanel, BorderLayout.NORTH);
+    }
+
+    public void setFilterListener(FilterListener filterListener) {
+        this.filterListener = filterListener;
+    }
+
+    public void updateFilteredMessages(List<Message> newFilteredMessages) {
+        this.filteredMessageList = newFilteredMessages;
         repaintMessages();
     }
 
-    // Fonction pour réafficher les messages avec la nouvelle liste
+    public void unsetMessageList(List<Message> newMessageList) {
+        this.originalMessageList = newMessageList;
+        this.filteredMessageList = new ArrayList<>(newMessageList);
+        repaintMessages();
+    }
+
     private void repaintMessages() {
-        clearMessages(); // Efface les anciens messages
-        displayMessages(); // Affiche les nouveaux messages
+        clearMessages();
+        displayMessages();
     }
 
     private void createStyles() {
-        // Style de base
         baseStyle = styleContext.addStyle("base", null);
         StyleConstants.setFontFamily(baseStyle, "Arial");
         StyleConstants.setFontSize(baseStyle, 14);
 
-        // Style pour les tags
         tagStyle = styleContext.addStyle("tag", baseStyle);
-        StyleConstants.setForeground(tagStyle, new Color(33, 150, 243)); // Bleu Material Design
+        StyleConstants.setForeground(tagStyle, new Color(33, 150, 243));
         StyleConstants.setBold(tagStyle, true);
 
-        // Style pour les timestamps
         timestampStyle = styleContext.addStyle("timestamp", baseStyle);
         StyleConstants.setForeground(timestampStyle, Color.GRAY);
         StyleConstants.setItalic(timestampStyle, true);
 
-        // Style pour les messages
         messageStyle = styleContext.addStyle("message", baseStyle);
         StyleConstants.setForeground(messageStyle, Color.BLACK);
     }
 
     private void displayMessages() {
         try {
-            // Pour chaque message dans la liste, formater et afficher
-            for (Message msg : messageList) {
-                // Convertir le long en Date
+            for (Message msg : filteredMessageList) {
                 Date date = new Date(msg.getEmissionDate());
-
-                // Formatter la date
-                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");  // Correction du format
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
                 String timestamp = sdf.format(date);
 
-                // Ajouter le timestamp
-                document.insertString(document.getLength(),
-                        timestamp + " ",
-                        timestampStyle
-                );
-
-                // Ajouter le tag de l'utilisateur
-                User sender = msg.getSender();
-                document.insertString(document.getLength(),
-                        "@" + sender.getUserTag() + " ",
-                        tagStyle
-                );
-
-                // Ajouter le message
-                document.insertString(document.getLength(),
-                        msg.getText() + "\n",
-                        messageStyle
-                );
+                document.insertString(document.getLength(), timestamp + " ", timestampStyle);
+                document.insertString(document.getLength(), "@" + msg.getSender().getUserTag() + " ", tagStyle);
+                document.insertString(document.getLength(), msg.getText() + "\n", messageStyle);
             }
-
-            // Faire défiler jusqu'au dernier message
             messagePane.setCaretPosition(document.getLength());
-
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
     }
 
-
-    // Fonction pour effacer tous les messages actuellement affichés
     private void clearMessages() {
         try {
             document.remove(0, document.getLength());

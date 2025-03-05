@@ -5,6 +5,9 @@ import main.java.com.ubo.tp.message.core.database.IDatabase;
 import main.java.com.ubo.tp.message.datamodel.Message;
 import main.java.com.ubo.tp.message.datamodel.User;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MessageService {
 
     private IDatabase db;
@@ -22,5 +25,14 @@ public class MessageService {
             Message msg = new Message(user,content);
             db.addMessage(msg);
         }
+    }
+
+    public List<Message> getMessageForUser(User user) {
+        List<Message> liste = new ArrayList<>();
+        for(Message msg : this.db.getUserMessages(user)){
+            liste.add(msg);
+        }
+        //toAddMessagesFollowing
+        return liste;
     }
 }
