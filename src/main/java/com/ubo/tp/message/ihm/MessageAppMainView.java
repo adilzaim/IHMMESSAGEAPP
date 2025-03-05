@@ -1,6 +1,8 @@
 package main.java.com.ubo.tp.message.ihm;
 
+import main.java.com.ubo.tp.message.datamodel.User;
 import main.java.com.ubo.tp.message.ihm.listener.ExitListener;
+import main.java.com.ubo.tp.message.ihm.messageComponent.MessagePanel;
 import main.java.com.ubo.tp.message.ihm.userComponent.UserMapView;
 
 import javax.swing.*;
@@ -9,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -17,28 +20,36 @@ import java.util.stream.Collectors;
 public class MessageAppMainView extends JFrame {
 
     private String selectedDirectory; // Stocke le répertoire sélectionné
+    private ExitListener exitListener;
+    private LoginView component;
+    private JSplitPane mainSplitPane;
+    private JSplitPane bottomSplitPane;
+    private JPanel loginContainer;
+    private MessagePanel messagePanel;
+    private JPanel rightBottomContainer;
 
+
+
+    /**
+     * Définit l'écouteur de sortie de l'application.
+     */
     public void setListener(ExitListener exitListener) {
         this.exitListener = exitListener;
     }
 
-    private ExitListener exitListener;
-
-
+    /**
+     * Définit le composant de login.
+     */
     public void setComponent(LoginView component) {
         this.component = component;
     }
 
-    private LoginView component;
-
-
-
+    /**
+     * Initialise le composant de login.
+     */
     private void initializeLoginComponent() {
-        // Définit le login comme contenu principal
-        setContentPane(component);
+        loginContainer.add(component, BorderLayout.CENTER);
     }
-
-
 
     /**
      * Constructeur principal.
@@ -47,7 +58,8 @@ public class MessageAppMainView extends JFrame {
         super("MessageApp - " + directory);
 
         this.component = loginView;
-        // Chargement et définition de l'icône de l'application (conservant ta config)
+
+        // Chargement et définition de l'icône de l'application
         setApplicationIcon();
 
         // Configuration de la fenêtre
@@ -60,8 +72,32 @@ public class MessageAppMainView extends JFrame {
 
         // Ajout de la barre de menu
         setJMenuBar(createMenuBar());
+
+        // Initialisation du conteneur de login
+        loginContainer = new JPanel(new BorderLayout());
+
+        // Initialisation du conteneur bottom-right
+        rightBottomContainer = new JPanel(new BorderLayout());
+
+        // Initialisation du split pane horizontal pour le bas
+        bottomSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        bottomSplitPane.setLeftComponent(null);  // Message panel sera ajouté ici
+        bottomSplitPane.setRightComponent(rightBottomContainer);
+        bottomSplitPane.setResizeWeight(0.7);  // Message panel prendra 70% de la largeur
+        bottomSplitPane.setDividerLocation(500);
+
+        // Initialisation du split pane vertical principal
+        mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        mainSplitPane.setTopComponent(loginContainer);
+        mainSplitPane.setBottomComponent(bottomSplitPane);
+        mainSplitPane.setResizeWeight(0.8); // La partie supérieure occupe 80% de l'espace
+        mainSplitPane.setDividerLocation(480); // Position initiale du diviseur
+
+        // Initialiser le composant de login
         initializeLoginComponent();
 
+        // Définir le split pane comme contenu principal
+        setContentPane(mainSplitPane);
     }
 
     /**
@@ -76,7 +112,7 @@ public class MessageAppMainView extends JFrame {
     }
 
     /**
-     * Définit l'icône de l'application (garde ta configuration).
+     * Définit l'icône de l'application.
      */
     private void setApplicationIcon() {
         ImageIcon iconURL = new ImageIcon("src/main/resources/images/logo_20.png");
@@ -112,8 +148,6 @@ public class MessageAppMainView extends JFrame {
         aboutItem.addActionListener(e -> showAboutDialog());
         helpMenu.add(aboutItem);
         menuBar.add(helpMenu);
-
-
 
         return menuBar;
     }
@@ -190,7 +224,9 @@ public class MessageAppMainView extends JFrame {
         return path.toFile().isDirectory() ? "[📂] " + relativePath : "  - " + relativePath;
     }
 
-
+    /**
+     * Sélectionne un répertoire au démarrage de l'application.
+     */
     public static String chooseDirectoryOnStartup() {
         JFileChooser chooser = new JFileChooser();
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -203,24 +239,67 @@ public class MessageAppMainView extends JFrame {
         return null; // Retourne null si l'utilisateur annule
     }
 
+
+    /**
+     * Revient à la vue de login.
+     */
+    public void setLoginView() {
+        // Revenir à la vue de login
+        loginContainer.removeAll();
+        loginContainer.add(component, BorderLayout.CENTER);
+
+        // Supprimer le panel de messages s'il existe
+        if (messagePanel != null) {
+            bottomSplitPane.setLeftComponent(null);
+        }
+
+        // Supprimer le composant de droite s'il existe
+        rightBottomContainer.removeAll();
+
+        // Forcer la mise à jour de l'affichage
+        revalidate();
+        repaint();
+    }
+
+    /**
+     * Définit la vue de la carte des utilisateurs.
+     */
     public void setUserMapView(UserMapView userMapView) {
+        // Remplacer le contenu de la partie supérieure
+        loginContainer.removeAll();
+        loginContainer.add(userMapView, BorderLayout.CENTER);
+
+        // Ajouter automatiquement un MessagePanel si nécessaire
+    }
 
 
+    /**
+     * Définit la vue des messages.
+     */
+    public void setMessageView(MessagePanel messagePanel) {
+        // Stocker la référence du panel de messages
+        this.messagePanel = messagePanel;
 
+        // Ajouter le panel de messages dans la partie gauche inférieure
+        bottomSplitPane.setLeftComponent(messagePanel);
 
+        // Ajuster la position du diviseur pour montrer le panel de messages
+        bottomSplitPane.setDividerLocation(500);
 
-
-
-        // Remplacer le contenu actuel par la vue utilisateur
-        setContentPane(userMapView);
+        // Forcer la mise à jour de l'affichage
         revalidate();
         repaint();
     }
 
-    public void setLoginView(){
-        setContentPane(component);
+    /**
+     * Ajoute un composant à la zone bottom-right.
+     */
+    public void setRightBottomComponent(JComponent component) {
+        rightBottomContainer.removeAll();
+        rightBottomContainer.add(component, BorderLayout.CENTER);
+
+        // Forcer la mise à jour de l'affichage
         revalidate();
         repaint();
     }
-
 }

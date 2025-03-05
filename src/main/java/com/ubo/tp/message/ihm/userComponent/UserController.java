@@ -12,7 +12,7 @@ public class UserController {
 
         this.userModel = userModel;
         this.userView = userView;
-        mMainView.setUserMapView(userView);
+        mMainView.setUserMapView(userView );
         this.initialiseListener();
 
 

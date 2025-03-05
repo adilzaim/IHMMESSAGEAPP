@@ -10,6 +10,8 @@ import main.java.com.ubo.tp.message.core.directory.WatchableDirectory;
 import main.java.com.ubo.tp.message.datamodel.Message;
 import main.java.com.ubo.tp.message.datamodel.User;
 import main.java.com.ubo.tp.message.ihm.listener.LoginListener;
+import main.java.com.ubo.tp.message.ihm.messageComponent.MessageController;
+import main.java.com.ubo.tp.message.ihm.messageComponent.MessagePanel;
 import main.java.com.ubo.tp.message.ihm.serviceUser.Service;
 import main.java.com.ubo.tp.message.ihm.userComponent.UserController;
 import main.java.com.ubo.tp.message.ihm.userComponent.UserMapView;
@@ -227,7 +229,7 @@ public class MessageApp implements IDatabaseObserver , UserModelObserver {
 	@Override
 	public void onUserLoggedIn(User user) {
         UserController userController = new UserController(this.userModel, this.mMainView , new UserMapView(this.userModel.getCurrentUser()));
-
+		MessageController messageController = new MessageController(this.userModel , new MessagePanel(this.userModel.getCurrentUser()),this.mDatabase,this.mMainView);
 
     }
 
