@@ -11,6 +11,9 @@ import main.java.com.ubo.tp.message.datamodel.Message;
 import main.java.com.ubo.tp.message.datamodel.User;
 import main.java.com.ubo.tp.message.ihm.listener.LoginListener;
 import main.java.com.ubo.tp.message.ihm.serviceUser.Service;
+import main.java.com.ubo.tp.message.ihm.userComponent.UserController;
+import main.java.com.ubo.tp.message.ihm.userComponent.UserModel;
+import main.java.com.ubo.tp.message.ihm.userComponent.UserModelObserver;
 
 import static main.java.com.ubo.tp.message.ihm.LoginView.showPopup;
 import static main.java.com.ubo.tp.message.ihm.MessageAppMainView.chooseDirectoryOnStartup;
@@ -21,7 +24,7 @@ import static main.java.com.ubo.tp.message.ihm.MessageAppMainView.chooseDirector
  *
  * @author S.Lucas
  */
-public class MessageApp implements IDatabaseObserver {
+public class MessageApp implements IDatabaseObserver , UserModelObserver {
 	/**
 	 * Base de données.
 	 */
@@ -54,7 +57,7 @@ public class MessageApp implements IDatabaseObserver {
 
 	private Service userService;
 
-
+	private UserModel userModel;
 	/**
 	 * Constructeur.
 	 *
@@ -65,7 +68,8 @@ public class MessageApp implements IDatabaseObserver {
 		this.mDatabase = database;
 		this.mEntityManager = entityManager;
 		this.userService = new Service(this.mDatabase,this.mEntityManager);
-
+		this.userModel = new UserModel();
+		this.userModel.addObserver(this);
 	}
 
 	/**
@@ -145,10 +149,10 @@ public class MessageApp implements IDatabaseObserver {
 	}
 
 	protected void doLogin(String name, String tag){
-		User user = this.userService.doLogin(name,tag);
-		if(user != null) {
-			this.mMainView.setUserMapView(user);
-		}else {
+		User user = this.userService.doLogin(name,tag,this.userModel);
+
+		if(user == null) {
+
 			showPopup("identifiants erroné", false);
 		}
 	}
@@ -219,4 +223,15 @@ public class MessageApp implements IDatabaseObserver {
 		System.out.println("--->Utilisateur modifié : " + modifiedUser.getName());
 	}
 
+	@Override
+	public void onUserLoggedIn(User user) {
+        UserController userController = new UserController(this.userModel, this.mMainView , new UserMapView(this.userModel.getCurrentUser()));
+
+
+    }
+
+	@Override
+	public void onUserLoggedOut() {
+
+	}
 }

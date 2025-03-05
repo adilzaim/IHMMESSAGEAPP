@@ -3,6 +3,7 @@ package main.java.com.ubo.tp.message.ihm.serviceUser;
 import main.java.com.ubo.tp.message.core.EntityManager;
 import main.java.com.ubo.tp.message.core.database.IDatabase;
 import main.java.com.ubo.tp.message.datamodel.User;
+import main.java.com.ubo.tp.message.ihm.userComponent.UserModel;
 
 import java.util.HashSet;
 import java.util.UUID;
@@ -16,9 +17,10 @@ public class Service {
         this.mEntityManager = entityManager;
     }
 
-    public User doLogin(String username, String tag) {
+    public User doLogin(String username, String tag, UserModel userModel) {
         for (User i : this.mDatabase.getUsers()) {
             if (i.getName().equals(username) && i.getUserTag().equals(tag)) {
+                userModel.setUser(i);
                 return i;
             }
         }

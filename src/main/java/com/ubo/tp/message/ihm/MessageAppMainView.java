@@ -205,15 +205,11 @@ public class MessageAppMainView extends JFrame {
         return null; // Retourne null si l'utilisateur annule
     }
 
-    public void setUserMapView(User user) {
-        // Créer une map à partir des informations de l'utilisateur
-        Map<String, Object> userMap = new HashMap<>();
-        userMap.put("Nom", user.getName());
-        userMap.put("Tag", user.getUserTag());
-        // Ajoutez d'autres informations utilisateur si nécessaire
+    public void setUserMapView(UserMapView userMapView) {
 
-        // Créer la vue de la map utilisateur
-        UserMapView userMapView = new UserMapView(userMap);
+
+
+
 
 
 
