@@ -11,6 +11,7 @@ import main.java.com.ubo.tp.message.core.directory.IWatchableDirectory;
 import main.java.com.ubo.tp.message.core.directory.WatchableDirectory;
 import main.java.com.ubo.tp.message.datamodel.Message;
 import main.java.com.ubo.tp.message.datamodel.User;
+import main.java.com.ubo.tp.message.ihm.ListUserComponent.*;
 import main.java.com.ubo.tp.message.ihm.listener.LoginListener;
 import main.java.com.ubo.tp.message.ihm.messageComponent.MessageAnnouncementView;
 import main.java.com.ubo.tp.message.ihm.messageComponent.MessageController;
@@ -236,11 +237,40 @@ public class MessageApp implements IDatabaseObserver , UserModelObserver {
 
 	@Override
 	public void onUserLoggedIn(User user) {
-        UserController userController = new UserController(this.userModel, this.mMainView , new UserMapView(this.userModel.getCurrentUser()));
+		ModelData modelData = new ModelData(this.mDatabase);
+		ListService service = new ListService(this.mDatabase);
+		service.initializeFollowLists(this.userModel.getCurrentUser(), modelData);
+		MainView mainView = new MainView(this.userModel.getCurrentUser(),modelData);
+		ListUserController listUserController = new ListUserController(userModel,mainView,modelData,service);
+		UserMapView userView = new UserMapView(this.userModel.getCurrentUser());
+        UserController userController = new UserController(this.userModel, this.mMainView , userView,mainView);
 		this.messageAnnouncementView = new MessageAnnouncementView(this.userService.getMessageUser(this.userModel.getCurrentUser()));
 		MessageController messageController = new MessageController(this.userModel , new MessagePanel(this.userModel.getCurrentUser()),this.mDatabase,this.mMainView,this.messageAnnouncementView);
-
+		this.initializeListener(service , modelData, userView , mainView);
     }
+
+	private void initializeListener(ListService service, ModelData modelData , UserMapView userView , MainView mainView ) {
+		ListListener listListener = new ListListener() {
+			@Override
+			public void follow(User userToFollow) {
+				service.follow(userModel.getCurrentUser() , userToFollow ,modelData);
+			}
+
+			@Override
+			public void unFollow(User userToUnFollow) {
+
+				service.unfollow(userModel.getCurrentUser() , userToUnFollow ,modelData);
+
+			}
+
+			@Override
+			public void back() {
+				mMainView.setUserMapView(userView);
+
+			}
+		};
+		mainView.setListener(listListener);
+	}
 
 	@Override
 	public void onUserLoggedOut() {

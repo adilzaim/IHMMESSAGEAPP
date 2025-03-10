@@ -48,7 +48,14 @@ public class Service {
         for(Message msg : this.mDatabase.getUserMessages(user)){
             liste.add(msg);
         }
-        //toAddMessagesFollowing
+        for(User u : this.mDatabase.getUsers()){
+            if(user.isFollowing(u)) {
+                for(Message msg : this.mDatabase.getUserMessages(u)){
+                    liste.add(msg);
+
+                }
+            }
+        }
         return liste;
     }
 

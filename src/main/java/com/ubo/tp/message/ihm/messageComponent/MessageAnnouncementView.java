@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class MessageAnnouncementView extends JPanel {
+public class MessageAnnouncementView extends JPanel   {
     private JTextPane messagePane;
     private DefaultStyledDocument document;
     private StyleContext styleContext;
@@ -148,4 +148,6 @@ public class MessageAnnouncementView extends JPanel {
             e.printStackTrace();
         }
     }
+
+
 }

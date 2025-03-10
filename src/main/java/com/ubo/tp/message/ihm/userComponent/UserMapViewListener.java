@@ -1,5 +1,7 @@
 package main.java.com.ubo.tp.message.ihm.userComponent;
 
+import main.java.com.ubo.tp.message.ihm.ListUserComponent.MainView;
+
 public interface UserMapViewListener {
 
     void onUserProfileView();

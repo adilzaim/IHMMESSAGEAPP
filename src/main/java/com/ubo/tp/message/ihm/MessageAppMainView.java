@@ -1,6 +1,7 @@
 package main.java.com.ubo.tp.message.ihm;
 
 import main.java.com.ubo.tp.message.datamodel.User;
+import main.java.com.ubo.tp.message.ihm.ListUserComponent.MainView;
 import main.java.com.ubo.tp.message.ihm.listener.ExitListener;
 import main.java.com.ubo.tp.message.ihm.messageComponent.MessagePanel;
 import main.java.com.ubo.tp.message.ihm.userComponent.UserMapView;
@@ -268,8 +269,9 @@ public class MessageAppMainView extends JFrame {
         // Remplacer le contenu de la partie supérieure
         loginContainer.removeAll();
         loginContainer.add(userMapView, BorderLayout.CENTER);
-
-        // Ajouter automatiquement un MessagePanel si nécessaire
+        // Forcer la mise à jour de l'affichage
+        revalidate();
+        repaint();
     }
 
 
@@ -297,6 +299,18 @@ public class MessageAppMainView extends JFrame {
     public void setRightBottomComponent(JComponent component) {
         rightBottomContainer.removeAll();
         rightBottomContainer.add(component, BorderLayout.CENTER);
+
+        // Forcer la mise à jour de l'affichage
+        revalidate();
+        repaint();
+    }
+
+    public void setUserListView(MainView mainView) {
+        // Supprimer le composant existant dans la partie supérieure
+        loginContainer.removeAll();
+
+        // Ajouter la vue des utilisateurs dans la partie supérieure
+        loginContainer.add(mainView, BorderLayout.CENTER);
 
         // Forcer la mise à jour de l'affichage
         revalidate();

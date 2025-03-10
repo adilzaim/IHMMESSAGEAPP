@@ -1,5 +1,6 @@
 package main.java.com.ubo.tp.message.ihm.userComponent;
 
+import main.java.com.ubo.tp.message.ihm.ListUserComponent.MainView;
 import main.java.com.ubo.tp.message.ihm.MessageAppMainView;
 
 public class UserController {
@@ -7,13 +8,18 @@ public class UserController {
     private UserMapView userView;
 
     private UserMapViewListener listener;
+    private MessageAppMainView mMainView;
 
-    public UserController(UserModel userModel, MessageAppMainView mMainView, UserMapView userView) {
+    private MainView mainView;
+
+    public UserController(UserModel userModel, MessageAppMainView mMainView, UserMapView userView, MainView mainView) {
 
         this.userModel = userModel;
         this.userView = userView;
-        mMainView.setUserMapView(userView );
+        this.mMainView = mMainView;
+        this.mMainView.setUserMapView(userView );
         this.initialiseListener();
+        this.mainView = mainView;
 
 
     }
@@ -27,6 +33,8 @@ public class UserController {
 
             @Override
             public void onUserListView() {
+
+                mMainView.setUserListView(mainView);
 
             }
 

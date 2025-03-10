@@ -31,8 +31,17 @@ public class MessageService {
         List<Message> liste = new ArrayList<>();
         for(Message msg : this.db.getUserMessages(user)){
             liste.add(msg);
+
         }
         //toAddMessagesFollowing
+        for(User u : this.db.getUsers()){
+            if(user.isFollowing(u)) {
+                for(Message msg : this.db.getUserMessages(u)){
+                    liste.add(msg);
+
+                }
+            }
+        }
         return liste;
     }
 }
