@@ -15,6 +15,7 @@ import main.java.com.ubo.tp.message.ihm.ListUserComponent.*;
 import main.java.com.ubo.tp.message.ihm.listener.LoginListener;
 import main.java.com.ubo.tp.message.ihm.messageComponent.MessageAnnouncementView;
 import main.java.com.ubo.tp.message.ihm.messageComponent.MessageController;
+import main.java.com.ubo.tp.message.ihm.messageComponent.MessageModel;
 import main.java.com.ubo.tp.message.ihm.messageComponent.MessagePanel;
 import main.java.com.ubo.tp.message.ihm.serviceUser.Service;
 import main.java.com.ubo.tp.message.ihm.userComponent.UserController;
@@ -245,7 +246,8 @@ public class MessageApp implements IDatabaseObserver , UserModelObserver {
 		UserMapView userView = new UserMapView(this.userModel.getCurrentUser());
         UserController userController = new UserController(this.userModel, this.mMainView , userView,mainView);
 		this.messageAnnouncementView = new MessageAnnouncementView(this.userService.getMessageUser(this.userModel.getCurrentUser()));
-		MessageController messageController = new MessageController(this.userModel , new MessagePanel(this.userModel.getCurrentUser()),this.mDatabase,this.mMainView,this.messageAnnouncementView);
+		MessageModel modelMessage = new MessageModel(this.mDatabase,this.userModel.getCurrentUser());
+		MessageController messageController = new MessageController(this.userModel , new MessagePanel(this.userModel.getCurrentUser(),modelMessage),this.mDatabase,this.mMainView,this.messageAnnouncementView);
 		this.initializeListener(service , modelData, userView , mainView);
     }
 

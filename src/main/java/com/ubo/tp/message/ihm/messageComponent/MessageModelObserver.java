@@ -8,6 +8,6 @@ public interface MessageModelObserver {
      *
      * @param updatedList La nouvelle liste des messages.
      */
-    void onMessageListUpdated(List<Object> updatedList);
+    void onMessageListUpdated(List<String> updatedList);
 }
 
