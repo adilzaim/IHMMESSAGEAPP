@@ -16,10 +16,13 @@ public class MessageController  {
     private MessageService messageService;
     private MessageListener listener;
     private FilterListener filterListener;
-    public MessageController(UserModel user , MessagePanel messageView , IDatabase db, MessageAppMainView mMainView , MessageAnnouncementView messageAnnouncementView){
+
+    private main.java.com.ubo.tp.message.core.EntityManager entityManager;
+    public MessageController(UserModel user , MessagePanel messageView , IDatabase db, MessageAppMainView mMainView , MessageAnnouncementView messageAnnouncementView, main.java.com.ubo.tp.message.core.EntityManager entityManager){
         this.messageService = new MessageService(db);
         this.messageView = messageView;
         this.userModel = user;
+        this.entityManager = entityManager;
         this.initializeListener();
         this.messageView.setMessageListener(this.listener);
         mMainView.setMessageView(this.messageView);
@@ -32,7 +35,7 @@ public class MessageController  {
         this.listener = new MessageListener() {
             @Override
             public void onMessageSend(String tag, String content) {
-                messageService.createMessage(tag,content);
+                messageService.createMessage(tag,content,entityManager);
             }
         };
     }

@@ -15,7 +15,7 @@ public class MessageService {
         this.db = db;
     }
 
-    public void createMessage(String tag , String content ){
+    public void createMessage(String tag , String content , main.java.com.ubo.tp.message.core.EntityManager entityManager){
         User user = null;
         for(User i : db.getUsers()){
             if(i.getUserTag().equals(tag)) user = i;
@@ -23,7 +23,7 @@ public class MessageService {
 
         if(user != null){
             Message msg = new Message(user,content);
-            db.addMessage(msg);
+            entityManager.writeMessageFile(msg);
         }
     }
 

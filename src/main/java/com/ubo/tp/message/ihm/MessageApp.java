@@ -1,7 +1,6 @@
 package main.java.com.ubo.tp.message.ihm;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import main.java.com.ubo.tp.message.core.EntityManager;
@@ -133,7 +132,8 @@ public class MessageApp implements IDatabaseObserver , UserModelObserver {
 
 			@Override
 			public void createUser(String name, String tag, String avatarPath ,String password) {
-				createNewUser(name,tag, avatarPath,password);
+				createNewUser(name,tag, avatarPath,password,mEntityManager);
+
 			}
 		});
 		mMainView = new MessageAppMainView(path,loginView);
@@ -167,8 +167,8 @@ public class MessageApp implements IDatabaseObserver , UserModelObserver {
 		}
 	}
 
-	protected void createNewUser(String name, String tag , String path, String password){
-		if(!(this.userService.createUser(name,tag,path, password))) showPopup("tag déja utilisé , choisisez un autre tag !", false);
+	protected void createNewUser(String name, String tag , String path, String password, EntityManager mEntityManager){
+		if(!(this.userService.createUser(name,tag,path, password,mEntityManager))) showPopup("tag déja utilisé , choisisez un autre tag !", false);
 
 
 	}
@@ -205,10 +205,12 @@ public class MessageApp implements IDatabaseObserver , UserModelObserver {
 
 	@Override
 	public void notifyMessageAdded(Message addedMessage) {
+		System.out.println("---> Message ajouté : " + addedMessage.toString());
+		if(userModel.getCurrentUser() == null) return;
 		List<Message> liste = this.userService.getMessageUser(this.userModel.getCurrentUser());
 		this.messageAnnouncementView.unsetMessageList(liste);
 		this.mMainView.setRightBottomComponent(this.messageAnnouncementView);
-		System.out.println("---> Message ajouté : " + addedMessage.toString());
+
 	}
 
 	@Override
@@ -247,7 +249,7 @@ public class MessageApp implements IDatabaseObserver , UserModelObserver {
         UserController userController = new UserController(this.userModel, this.mMainView , userView,mainView);
 		this.messageAnnouncementView = new MessageAnnouncementView(this.userService.getMessageUser(this.userModel.getCurrentUser()));
 		MessageModel modelMessage = new MessageModel(this.mDatabase,this.userModel.getCurrentUser());
-		MessageController messageController = new MessageController(this.userModel , new MessagePanel(this.userModel.getCurrentUser(),modelMessage),this.mDatabase,this.mMainView,this.messageAnnouncementView);
+		MessageController messageController = new MessageController(this.userModel , new MessagePanel(this.userModel.getCurrentUser(),modelMessage),this.mDatabase,this.mMainView,this.messageAnnouncementView,this.mEntityManager);
 		this.initializeListener(service , modelData, userView , mainView);
     }
 
@@ -255,13 +257,13 @@ public class MessageApp implements IDatabaseObserver , UserModelObserver {
 		ListListener listListener = new ListListener() {
 			@Override
 			public void follow(User userToFollow) {
-				service.follow(userModel.getCurrentUser() , userToFollow ,modelData);
+				service.follow(userModel.getCurrentUser() , userToFollow ,modelData,mEntityManager);
 			}
 
 			@Override
 			public void unFollow(User userToUnFollow) {
 
-				service.unfollow(userModel.getCurrentUser() , userToUnFollow ,modelData);
+				service.unfollow(userModel.getCurrentUser() , userToUnFollow ,modelData, mEntityManager);
 
 			}
 

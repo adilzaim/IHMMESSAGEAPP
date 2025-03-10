@@ -40,16 +40,20 @@ public class ListService {
         modelData.setAllUserNotfollowed(listUnfollow);
     }
 
-    public void follow(User currentUser, User userToFollow, ModelData modelData) {
+    public void follow(User currentUser, User userToFollow, ModelData modelData, main.java.com.ubo.tp.message.core.EntityManager entityManager) {
         if (userToFollow.equals(currentUser)) return;
-        if (!currentUser.isFollowing(userToFollow)) currentUser.addFollowing(userToFollow.getUserTag());
+        if (!currentUser.isFollowing(userToFollow)){
+            currentUser.addFollowing(userToFollow.getUserTag());
+            entityManager.writeUserFile(currentUser);
+        }
 
         // Mettre à jour les listes
         updateFollowLists(currentUser, modelData);
     }
 
-    public void unfollow(User currentUser, User userToUnFollow, ModelData modelData) {
+    public void unfollow(User currentUser, User userToUnFollow, ModelData modelData, main.java.com.ubo.tp.message.core.EntityManager entityManager) {
         currentUser.removeFollowing(userToUnFollow.getUserTag());
+        entityManager.writeUserFile(currentUser);
 
         // Mettre à jour les listes
         updateFollowLists(currentUser, modelData);

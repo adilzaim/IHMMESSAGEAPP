@@ -4,7 +4,6 @@ import main.java.com.ubo.tp.message.core.EntityManager;
 import main.java.com.ubo.tp.message.core.database.IDatabase;
 import main.java.com.ubo.tp.message.datamodel.Message;
 import main.java.com.ubo.tp.message.datamodel.User;
-import main.java.com.ubo.tp.message.ihm.MessageApp;
 import main.java.com.ubo.tp.message.ihm.userComponent.UserModel;
 
 import java.util.ArrayList;
@@ -31,13 +30,15 @@ public class Service {
         return null;
     }
 
-    public boolean createUser(String nom, String tag, String avatarPath, String password) {
+    public boolean createUser(String nom, String tag, String avatarPath, String password, EntityManager mEntityManager) {
         // Vérifier si l'utilisateur existe déjà
         boolean exists = this.mDatabase.getUsers().stream().anyMatch(i -> i.getUserTag().equals(tag));
 
         // Si l'utilisateur n'existe pas, l'ajouter
         if (!exists) {
-            this.mDatabase.addUser(new User(UUID.randomUUID(), tag, password, nom, new HashSet<>(), avatarPath));
+            User user = new User(UUID.randomUUID(), tag, password, nom, new HashSet<>(), avatarPath);
+            //this.mDatabase.addUser(user);
+            mEntityManager.writeUserFile(user);
         }
 
         return !exists;

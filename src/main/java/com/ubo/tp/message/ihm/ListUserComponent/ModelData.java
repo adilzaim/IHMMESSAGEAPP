@@ -24,6 +24,8 @@ public class ModelData implements IDatabaseObserver {
         this.db.addObserver(this);
     }
 
+
+
     // Ajouter un observateur à la liste
     public void addObserver(ModelObserver observer) {
         observers.add(observer);

@@ -69,6 +69,7 @@ public class MessageModel implements IDatabaseObserver {
 
     @Override
     public void notifyMessageAdded(Message addedMessage) {
+        if(currentUser == null) return ;
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy à HH:mm:ss");
         Date messageDate = new Date(addedMessage.getEmissionDate());
         if(this.currentUser.isFollowing(addedMessage.getSender())) {
