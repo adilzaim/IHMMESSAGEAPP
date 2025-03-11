@@ -1,5 +1,6 @@
 package main.java.com.ubo.tp.message.ihm.userComponent;
 
+import com.ubo.tp.message.ihm.searchUser.SearchUserView;
 import main.java.com.ubo.tp.message.datamodel.User;
 
 import javax.imageio.ImageIO;
@@ -17,14 +18,14 @@ public class UserMapView extends JPanel {
 
     // Listener instance
     private UserMapViewListener listener;
-
+    private SearchUserView searchUserView;
     /**
      * Constructor for UserMapView
      * @param user  containing user information
      */
-    public UserMapView(User user) {
+    public UserMapView(User user , SearchUserView searchUserView) {
         this.user = user;
-
+        this.searchUserView = searchUserView;
         // Set up the layout
         setLayout(new BorderLayout());
 
@@ -118,7 +119,7 @@ public class UserMapView extends JPanel {
         JButton searchButton = new JButton("Rechercher");
         searchButton.addActionListener(e -> {
             if (listener != null) {
-                listener.onUserSearch();
+                listener.onUserSearch(searchUserView);
             }
         });
         panel.add(searchButton);

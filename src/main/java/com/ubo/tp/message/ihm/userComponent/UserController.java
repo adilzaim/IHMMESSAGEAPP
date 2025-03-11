@@ -1,5 +1,6 @@
 package main.java.com.ubo.tp.message.ihm.userComponent;
 
+import com.ubo.tp.message.ihm.searchUser.SearchUserView;
 import main.java.com.ubo.tp.message.ihm.ListUserComponent.MainView;
 import main.java.com.ubo.tp.message.ihm.MessageAppMainView;
 
@@ -39,7 +40,8 @@ public class UserController {
             }
 
             @Override
-            public void onUserSearch() {
+            public void onUserSearch(SearchUserView searchUserView) {
+                mMainView.setSearchUser(searchUserView);
 
             }
 

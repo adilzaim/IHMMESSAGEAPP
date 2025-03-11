@@ -1,5 +1,6 @@
 package main.java.com.ubo.tp.message.ihm;
 
+import com.ubo.tp.message.ihm.searchUser.SearchUserView;
 import main.java.com.ubo.tp.message.datamodel.User;
 import main.java.com.ubo.tp.message.ihm.ListUserComponent.MainView;
 import main.java.com.ubo.tp.message.ihm.listener.ExitListener;
@@ -311,6 +312,18 @@ public class MessageAppMainView extends JFrame {
 
         // Ajouter la vue des utilisateurs dans la partie supérieure
         loginContainer.add(mainView, BorderLayout.CENTER);
+
+        // Forcer la mise à jour de l'affichage
+        revalidate();
+        repaint();
+    }
+
+    public void setSearchUser(SearchUserView searchUserView) {
+        // Supprimer le composant existant dans la partie supérieure
+        loginContainer.removeAll();
+
+        // Ajouter la vue des utilisateurs dans la partie supérieure
+        loginContainer.add(searchUserView, BorderLayout.CENTER);
 
         // Forcer la mise à jour de l'affichage
         revalidate();

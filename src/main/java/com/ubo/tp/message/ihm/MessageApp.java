@@ -3,6 +3,9 @@ package main.java.com.ubo.tp.message.ihm;
 import java.io.File;
 import java.util.List;
 
+import com.ubo.tp.message.ihm.searchUser.ControllerSearch;
+import com.ubo.tp.message.ihm.searchUser.SearchUserModel;
+import com.ubo.tp.message.ihm.searchUser.SearchUserView;
 import main.java.com.ubo.tp.message.core.EntityManager;
 import main.java.com.ubo.tp.message.core.database.IDatabase;
 import main.java.com.ubo.tp.message.core.database.IDatabaseObserver;
@@ -245,12 +248,16 @@ public class MessageApp implements IDatabaseObserver , UserModelObserver {
 		service.initializeFollowLists(this.userModel.getCurrentUser(), modelData);
 		MainView mainView = new MainView(this.userModel.getCurrentUser(),modelData);
 		ListUserController listUserController = new ListUserController(userModel,mainView,modelData,service);
-		UserMapView userView = new UserMapView(this.userModel.getCurrentUser());
+		SearchUserModel modelSearch = new SearchUserModel(this.mDatabase);
+		SearchUserView viewSearchUser = new SearchUserView(modelSearch);
+		UserMapView userView = new UserMapView(this.userModel.getCurrentUser() ,viewSearchUser);
         UserController userController = new UserController(this.userModel, this.mMainView , userView,mainView);
 		this.messageAnnouncementView = new MessageAnnouncementView(this.userService.getMessageUser(this.userModel.getCurrentUser()));
 		MessageModel modelMessage = new MessageModel(this.mDatabase,this.userModel.getCurrentUser());
 		MessageController messageController = new MessageController(this.userModel , new MessagePanel(this.userModel.getCurrentUser(),modelMessage),this.mDatabase,this.mMainView,this.messageAnnouncementView,this.mEntityManager);
 		this.initializeListener(service , modelData, userView , mainView);
+
+		ControllerSearch controllerSearch = new ControllerSearch(this.mDatabase , modelSearch , viewSearchUser , this.mMainView, userView);
     }
 
 	private void initializeListener(ListService service, ModelData modelData , UserMapView userView , MainView mainView ) {
