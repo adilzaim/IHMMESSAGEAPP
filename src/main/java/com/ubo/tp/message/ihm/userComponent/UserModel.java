@@ -1,6 +1,6 @@
-package main.java.com.ubo.tp.message.ihm.userComponent;
+package com.ubo.tp.message.ihm.userComponent;
 
-import main.java.com.ubo.tp.message.datamodel.User;
+import com.ubo.tp.message.datamodel.User;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,13 +30,13 @@ public class UserModel {
         observers.remove(observer);
     }
 
-    private void notifyUserLoggedIn() {
+    public void notifyUserLoggedIn() {
         for (UserModelObserver observer : observers) {
             observer.onUserLoggedIn(currentUser);
         }
     }
 
-    private void notifyUserLoggedOut() {
+    public void notifyUserLoggedOut() {
         for (UserModelObserver observer : observers) {
             observer.onUserLoggedOut();
         }

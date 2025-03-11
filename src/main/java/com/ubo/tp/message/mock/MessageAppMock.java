@@ -1,4 +1,4 @@
-package main.java.com.ubo.tp.message.mock;
+package com.ubo.tp.message.mock;
 
 import java.awt.Button;
 import java.awt.Dimension;
@@ -16,10 +16,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
-import main.java.com.ubo.tp.message.core.EntityManager;
-import main.java.com.ubo.tp.message.core.database.IDatabase;
-import main.java.com.ubo.tp.message.datamodel.Message;
-import main.java.com.ubo.tp.message.datamodel.User;
+import com.ubo.tp.message.core.EntityManager;
+import com.ubo.tp.message.core.database.IDatabase;
+import com.ubo.tp.message.datamodel.Message;
+import com.ubo.tp.message.datamodel.User;
 
 public class MessageAppMock {
 

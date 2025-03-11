@@ -1,10 +1,10 @@
-package main.java.com.ubo.tp.message.datamodel;
+package com.ubo.tp.message.datamodel;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import main.java.com.ubo.tp.message.common.Constants;
+import com.ubo.tp.message.common.Constants;
 
 /**
  * Classe du modèle représentant un message.

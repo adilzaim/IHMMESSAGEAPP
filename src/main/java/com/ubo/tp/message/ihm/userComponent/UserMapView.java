@@ -1,7 +1,7 @@
-package main.java.com.ubo.tp.message.ihm.userComponent;
+package com.ubo.tp.message.ihm.userComponent;
 
 import com.ubo.tp.message.ihm.searchUser.SearchUserView;
-import main.java.com.ubo.tp.message.datamodel.User;
+import com.ubo.tp.message.datamodel.User;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

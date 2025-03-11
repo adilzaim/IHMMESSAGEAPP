@@ -1,4 +1,4 @@
-package main.java.com.ubo.tp.message.ihm.messageComponent;
+package com.ubo.tp.message.ihm.messageComponent;
 
 import java.util.List;
 

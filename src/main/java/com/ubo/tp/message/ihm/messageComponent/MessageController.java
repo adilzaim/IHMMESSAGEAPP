@@ -1,11 +1,12 @@
-package main.java.com.ubo.tp.message.ihm.messageComponent;
+package com.ubo.tp.message.ihm.messageComponent;
 
-import main.java.com.ubo.tp.message.core.database.IDatabase;
-import main.java.com.ubo.tp.message.core.database.IDatabaseObserver;
-import main.java.com.ubo.tp.message.datamodel.Message;
-import main.java.com.ubo.tp.message.datamodel.User;
-import main.java.com.ubo.tp.message.ihm.MessageAppMainView;
-import main.java.com.ubo.tp.message.ihm.userComponent.UserModel;
+import com.ubo.tp.message.core.EntityManager;
+import com.ubo.tp.message.core.database.IDatabase;
+import com.ubo.tp.message.core.database.IDatabaseObserver;
+import com.ubo.tp.message.datamodel.Message;
+import com.ubo.tp.message.datamodel.User;
+import com.ubo.tp.message.ihm.MessageAppMainView;
+import com.ubo.tp.message.ihm.userComponent.UserModel;
 
 import java.util.List;
 
@@ -17,8 +18,8 @@ public class MessageController  {
     private MessageListener listener;
     private FilterListener filterListener;
 
-    private main.java.com.ubo.tp.message.core.EntityManager entityManager;
-    public MessageController(UserModel user , MessagePanel messageView , IDatabase db, MessageAppMainView mMainView , MessageAnnouncementView messageAnnouncementView, main.java.com.ubo.tp.message.core.EntityManager entityManager){
+    private EntityManager entityManager;
+    public MessageController(UserModel user , MessagePanel messageView , IDatabase db, MessageAppMainView mMainView , MessageAnnouncementView messageAnnouncementView, EntityManager entityManager){
         this.messageService = new MessageService(db);
         this.messageView = messageView;
         this.userModel = user;

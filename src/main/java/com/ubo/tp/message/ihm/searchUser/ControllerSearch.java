@@ -1,11 +1,11 @@
 package com.ubo.tp.message.ihm.searchUser;
 
-import main.java.com.ubo.tp.message.core.database.IDatabase;
-import main.java.com.ubo.tp.message.datamodel.User;
+import com.ubo.tp.message.core.database.IDatabase;
+import com.ubo.tp.message.datamodel.User;
 
 import java.util.ArrayList;
-import main.java.com.ubo.tp.message.ihm.MessageAppMainView;
-import main.java.com.ubo.tp.message.ihm.userComponent.UserMapView;
+import com.ubo.tp.message.ihm.MessageAppMainView;
+import com.ubo.tp.message.ihm.userComponent.UserMapView;
 public class ControllerSearch {
 
     private IDatabase db ;

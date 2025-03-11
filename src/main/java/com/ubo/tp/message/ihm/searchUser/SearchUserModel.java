@@ -1,10 +1,10 @@
 package com.ubo.tp.message.ihm.searchUser;
 
-import main.java.com.ubo.tp.message.datamodel.User;
+import com.ubo.tp.message.datamodel.User;
 
 import java.util.ArrayList;
 import java.util.List;
-import main.java.com.ubo.tp.message.core.database.IDatabase;
+import com.ubo.tp.message.core.database.IDatabase;
 public class SearchUserModel {
     private List<User> users;
     private List<SearchModelObserver> observers;
@@ -45,7 +45,7 @@ public class SearchUserModel {
         this.notifyObservers();
     }
 
-    public List<main.java.com.ubo.tp.message.datamodel.User> getUsersModel() {
+    public List<User> getUsersModel() {
         return this.users;
     }
 }

@@ -1,4 +1,4 @@
-package main.java.com.ubo.tp.message.common;
+package com.ubo.tp.message.common;
 
 import java.io.File;
 import java.util.Base64;
@@ -8,8 +8,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
 
-import main.java.com.ubo.tp.message.datamodel.Message;
-import main.java.com.ubo.tp.message.datamodel.User;
+import com.ubo.tp.message.datamodel.Message;
+import com.ubo.tp.message.datamodel.User;
 
 /**
  * Classe de gestion des conversion des objets entre le datamodel et les

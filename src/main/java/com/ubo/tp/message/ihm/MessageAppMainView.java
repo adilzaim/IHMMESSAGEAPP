@@ -1,11 +1,11 @@
-package main.java.com.ubo.tp.message.ihm;
+package com.ubo.tp.message.ihm;
 
 import com.ubo.tp.message.ihm.searchUser.SearchUserView;
-import main.java.com.ubo.tp.message.datamodel.User;
-import main.java.com.ubo.tp.message.ihm.ListUserComponent.MainView;
-import main.java.com.ubo.tp.message.ihm.listener.ExitListener;
-import main.java.com.ubo.tp.message.ihm.messageComponent.MessagePanel;
-import main.java.com.ubo.tp.message.ihm.userComponent.UserMapView;
+import com.ubo.tp.message.datamodel.User;
+import com.ubo.tp.message.ihm.ListUserComponent.MainView;
+import com.ubo.tp.message.ihm.listener.ExitListener;
+import com.ubo.tp.message.ihm.messageComponent.MessagePanel;
+import com.ubo.tp.message.ihm.userComponent.UserMapView;
 
 import javax.swing.*;
 import java.awt.*;

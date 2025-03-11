@@ -1,14 +1,15 @@
-package main.java.com.ubo.tp.message.ihm.ListUserComponent;
+package com.ubo.tp.message.ihm.ListUserComponent;
 
-import main.java.com.ubo.tp.message.core.database.IDatabase;
-import main.java.com.ubo.tp.message.datamodel.User;
-
+import com.ubo.tp.message.core.database.IDatabase;
+import com.ubo.tp.message.datamodel.User;
+import com.ubo.tp.message.core.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ListService {
 
     private IDatabase db;
+
 
     public ListService(IDatabase db) {
         this.db = db;
@@ -40,27 +41,24 @@ public class ListService {
         modelData.setAllUserNotfollowed(listUnfollow);
     }
 
-    public void follow(User currentUser, User userToFollow, ModelData modelData, main.java.com.ubo.tp.message.core.EntityManager entityManager) {
+    public void follow(User currentUser, User userToFollow, ModelData modelData, EntityManager entityManager) {
         if (userToFollow.equals(currentUser)) return;
         if (!currentUser.isFollowing(userToFollow)){
             currentUser.addFollowing(userToFollow.getUserTag());
             entityManager.writeUserFile(currentUser);
         }
 
-        // Mettre à jour les listes
-        updateFollowLists(currentUser, modelData);
+
     }
 
-    public void unfollow(User currentUser, User userToUnFollow, ModelData modelData, main.java.com.ubo.tp.message.core.EntityManager entityManager) {
+    public void unfollow(User currentUser, User userToUnFollow, ModelData modelData, EntityManager entityManager) {
         currentUser.removeFollowing(userToUnFollow.getUserTag());
         entityManager.writeUserFile(currentUser);
 
-        // Mettre à jour les listes
-        updateFollowLists(currentUser, modelData);
     }
 
     // Méthode utilitaire pour mettre à jour les listes
-    private void updateFollowLists(User currentUser, ModelData modelData) {
+    public void updateFollowLists(User currentUser, ModelData modelData) {
         List<User> listFollow = new ArrayList<>();
         List<User> listUnfollow = new ArrayList<>();
 

@@ -1,6 +1,6 @@
-package main.java.com.ubo.tp.message.ihm.userComponent;
+package com.ubo.tp.message.ihm.userComponent;
 
-import main.java.com.ubo.tp.message.datamodel.User;
+import com.ubo.tp.message.datamodel.User;
 
 public interface UserModelObserver {
     void onUserLoggedIn(User user);

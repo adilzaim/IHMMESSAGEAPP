@@ -1,7 +1,7 @@
-package main.java.com.ubo.tp.message.ihm.userComponent;
+package com.ubo.tp.message.ihm.userComponent;
 
 import com.ubo.tp.message.ihm.searchUser.SearchUserView;
-import main.java.com.ubo.tp.message.ihm.ListUserComponent.MainView;
+import com.ubo.tp.message.ihm.ListUserComponent.MainView;
 
 public interface UserMapViewListener {
 

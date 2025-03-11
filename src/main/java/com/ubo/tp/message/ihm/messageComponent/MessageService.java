@@ -1,9 +1,10 @@
-package main.java.com.ubo.tp.message.ihm.messageComponent;
+package com.ubo.tp.message.ihm.messageComponent;
 
-import main.java.com.ubo.tp.message.core.database.Database;
-import main.java.com.ubo.tp.message.core.database.IDatabase;
-import main.java.com.ubo.tp.message.datamodel.Message;
-import main.java.com.ubo.tp.message.datamodel.User;
+import com.ubo.tp.message.core.EntityManager;
+import com.ubo.tp.message.core.database.Database;
+import com.ubo.tp.message.core.database.IDatabase;
+import com.ubo.tp.message.datamodel.Message;
+import com.ubo.tp.message.datamodel.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,7 @@ public class MessageService {
         this.db = db;
     }
 
-    public void createMessage(String tag , String content , main.java.com.ubo.tp.message.core.EntityManager entityManager){
+    public void createMessage(String tag , String content , EntityManager entityManager){
         User user = null;
         for(User i : db.getUsers()){
             if(i.getUserTag().equals(tag)) user = i;

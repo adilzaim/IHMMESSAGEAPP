@@ -1,6 +1,6 @@
-package main.java.com.ubo.tp.message.ihm;
+package com.ubo.tp.message.ihm;
 
-import main.java.com.ubo.tp.message.ihm.listener.LoginListener;
+import com.ubo.tp.message.ihm.listener.LoginListener;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -9,7 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
-public class LoginView extends JPanel {
+ class LoginView extends JPanel {
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JButton loginButton;

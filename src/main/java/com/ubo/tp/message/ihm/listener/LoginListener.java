@@ -1,4 +1,4 @@
-package main.java.com.ubo.tp.message.ihm.listener;
+package com.ubo.tp.message.ihm.listener;
 
 public interface LoginListener {
     void loginVerify(String username , String tag);

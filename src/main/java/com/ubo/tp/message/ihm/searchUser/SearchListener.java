@@ -1,5 +1,5 @@
 package com.ubo.tp.message.ihm.searchUser;
-import main.java.com.ubo.tp.message.datamodel.User;
+import com.ubo.tp.message.datamodel.User;
 /**
  * Interface définissant les méthodes de callback pour les événements de recherche.
  * Cette interface sert de pont entre la vue et le contrôleur.

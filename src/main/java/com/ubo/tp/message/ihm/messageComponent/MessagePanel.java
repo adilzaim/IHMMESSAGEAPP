@@ -1,4 +1,4 @@
-package main.java.com.ubo.tp.message.ihm.messageComponent;
+package com.ubo.tp.message.ihm.messageComponent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -6,7 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-import main.java.com.ubo.tp.message.datamodel.User;
+import com.ubo.tp.message.datamodel.User;
 
 public class MessagePanel extends JPanel implements MessageModelObserver {
     private JTextArea messageArea;

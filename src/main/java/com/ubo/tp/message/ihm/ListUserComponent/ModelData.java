@@ -1,9 +1,9 @@
-package main.java.com.ubo.tp.message.ihm.ListUserComponent;
+package com.ubo.tp.message.ihm.ListUserComponent;
 
-import main.java.com.ubo.tp.message.core.database.IDatabase;
-import main.java.com.ubo.tp.message.core.database.IDatabaseObserver;
-import main.java.com.ubo.tp.message.datamodel.Message;
-import main.java.com.ubo.tp.message.datamodel.User;
+import com.ubo.tp.message.core.database.IDatabase;
+import com.ubo.tp.message.core.database.IDatabaseObserver;
+import com.ubo.tp.message.datamodel.Message;
+import com.ubo.tp.message.datamodel.User;
 
 import java.util.List;
 import java.util.ArrayList;

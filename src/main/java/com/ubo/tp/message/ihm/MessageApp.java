@@ -1,4 +1,4 @@
-package main.java.com.ubo.tp.message.ihm;
+package com.ubo.tp.message.ihm;
 
 import java.io.File;
 import java.util.List;
@@ -6,27 +6,28 @@ import java.util.List;
 import com.ubo.tp.message.ihm.searchUser.ControllerSearch;
 import com.ubo.tp.message.ihm.searchUser.SearchUserModel;
 import com.ubo.tp.message.ihm.searchUser.SearchUserView;
-import main.java.com.ubo.tp.message.core.EntityManager;
-import main.java.com.ubo.tp.message.core.database.IDatabase;
-import main.java.com.ubo.tp.message.core.database.IDatabaseObserver;
-import main.java.com.ubo.tp.message.core.directory.IWatchableDirectory;
-import main.java.com.ubo.tp.message.core.directory.WatchableDirectory;
-import main.java.com.ubo.tp.message.datamodel.Message;
-import main.java.com.ubo.tp.message.datamodel.User;
-import main.java.com.ubo.tp.message.ihm.ListUserComponent.*;
-import main.java.com.ubo.tp.message.ihm.listener.LoginListener;
-import main.java.com.ubo.tp.message.ihm.messageComponent.MessageAnnouncementView;
-import main.java.com.ubo.tp.message.ihm.messageComponent.MessageController;
-import main.java.com.ubo.tp.message.ihm.messageComponent.MessageModel;
-import main.java.com.ubo.tp.message.ihm.messageComponent.MessagePanel;
-import main.java.com.ubo.tp.message.ihm.serviceUser.Service;
-import main.java.com.ubo.tp.message.ihm.userComponent.UserController;
-import main.java.com.ubo.tp.message.ihm.userComponent.UserMapView;
-import main.java.com.ubo.tp.message.ihm.userComponent.UserModel;
-import main.java.com.ubo.tp.message.ihm.userComponent.UserModelObserver;
+import com.ubo.tp.message.core.EntityManager;
+import com.ubo.tp.message.core.database.IDatabase;
+import com.ubo.tp.message.core.database.IDatabaseObserver;
+import com.ubo.tp.message.core.directory.IWatchableDirectory;
+import com.ubo.tp.message.core.directory.WatchableDirectory;
+import com.ubo.tp.message.datamodel.Message;
+import com.ubo.tp.message.datamodel.User;
+import com.ubo.tp.message.ihm.ListUserComponent.*;
+import com.ubo.tp.message.ihm.listener.LoginListener;
+import com.ubo.tp.message.ihm.messageComponent.MessageAnnouncementView;
+import com.ubo.tp.message.ihm.messageComponent.MessageController;
+import com.ubo.tp.message.ihm.messageComponent.MessageModel;
+import com.ubo.tp.message.ihm.messageComponent.MessagePanel;
+import com.ubo.tp.message.ihm.serviceUser.Service;
+import com.ubo.tp.message.ihm.userComponent.UserController;
+import com.ubo.tp.message.ihm.userComponent.UserMapView;
+import com.ubo.tp.message.ihm.userComponent.UserModel;
+import com.ubo.tp.message.ihm.userComponent.UserModelObserver;
 
-import static main.java.com.ubo.tp.message.ihm.LoginView.showPopup;
-import static main.java.com.ubo.tp.message.ihm.MessageAppMainView.chooseDirectoryOnStartup;
+import static com.ubo.tp.message.ihm.LoginView.showPopup;
+
+import static com.ubo.tp.message.ihm.MessageAppMainView.chooseDirectoryOnStartup;
 
 
 /**
@@ -247,7 +248,7 @@ public class MessageApp implements IDatabaseObserver , UserModelObserver {
 		ListService service = new ListService(this.mDatabase);
 		service.initializeFollowLists(this.userModel.getCurrentUser(), modelData);
 		MainView mainView = new MainView(this.userModel.getCurrentUser(),modelData);
-		ListUserController listUserController = new ListUserController(userModel,mainView,modelData,service);
+		ListUserController listUserController = new ListUserController(userModel,mainView,modelData,service, this.userModel.getCurrentUser(),this.mDatabase);
 		SearchUserModel modelSearch = new SearchUserModel(this.mDatabase);
 		SearchUserView viewSearchUser = new SearchUserView(modelSearch);
 		UserMapView userView = new UserMapView(this.userModel.getCurrentUser() ,viewSearchUser);
