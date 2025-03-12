@@ -19,7 +19,7 @@ dependencies {
 jar {
     manifest {
         attributes(
-                'Main-Class': 'main.java.com.ubo.tp.message.MessageAppLauncher' // Remplace avec ta classe principale
+                'Main-Class': 'com.ubo.tp.message.MessageAppLauncher' // Remplace avec ta classe principale
         )
     }
 }

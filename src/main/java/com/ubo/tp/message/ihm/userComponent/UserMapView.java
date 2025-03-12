@@ -59,7 +59,7 @@ public class UserMapView extends JPanel {
         panel.add(createInfoLabel("Tag", user.getUserTag()));
         panel.add(createInfoLabel("Nom", user.getName()));
         panel.add(createInfoLabel("Mots de passe", user.getUserPassword()));
-        panel.add(createInfoLabel("Tags suivis", String.join(", ", user.getFollows())));
+        //panel.add(createInfoLabel("Tags suivis", String.join(", ", user.getFollows())));
 
         return panel;
     }

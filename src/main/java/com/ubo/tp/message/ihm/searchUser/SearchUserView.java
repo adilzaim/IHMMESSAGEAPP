@@ -28,7 +28,7 @@ public class SearchUserView extends JPanel implements SearchModelObserver {
 
         // Panel supérieur contenant la barre de recherche et les boutons
         JPanel searchPanel = new JPanel(new BorderLayout());
-        searchField = new JTextField();
+        searchField = new JTextField("Recherche par tag...");
         searchButton = new JButton("Rechercher");
         resetButton = new JButton("Réinitialiser");
         // Création du bouton "Retour" et ajout à la partie inférieure

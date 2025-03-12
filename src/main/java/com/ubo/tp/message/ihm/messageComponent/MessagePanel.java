@@ -137,4 +137,8 @@ public class MessagePanel extends JPanel implements MessageModelObserver {
             }
         });
     }
+
+    public void showPopUp(String message){
+        JOptionPane.showMessageDialog(null, message, "Information", JOptionPane.INFORMATION_MESSAGE);
+    }
 }

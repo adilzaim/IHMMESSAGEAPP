@@ -16,16 +16,18 @@ public class MessageService {
         this.db = db;
     }
 
-    public void createMessage(String tag , String content , EntityManager entityManager){
+    public boolean createMessage(String tag , String content , EntityManager entityManager){
         User user = null;
         for(User i : db.getUsers()){
             if(i.getUserTag().equals(tag)) user = i;
         }
 
-        if(user != null){
+        if(user != null && content.length()<= 200){
             Message msg = new Message(user,content);
             entityManager.writeMessageFile(msg);
+            return true;
         }
+        return false;
     }
 
     public List<Message> getMessageForUser(User user) {

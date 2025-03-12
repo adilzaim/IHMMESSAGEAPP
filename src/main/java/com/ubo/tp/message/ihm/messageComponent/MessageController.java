@@ -36,7 +36,8 @@ public class MessageController  {
         this.listener = new MessageListener() {
             @Override
             public void onMessageSend(String tag, String content) {
-                messageService.createMessage(tag,content,entityManager);
+               boolean send =  messageService.createMessage(tag,content,entityManager);
+               if(!send) messageView.showPopUp("Le message ne doit pas depasser 200 caractères");
             }
         };
     }

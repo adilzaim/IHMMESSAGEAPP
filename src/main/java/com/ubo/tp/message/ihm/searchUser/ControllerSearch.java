@@ -31,7 +31,7 @@ public class ControllerSearch {
                 // Traitement à exécuter lors d'une recherche
                 ArrayList<User> list = new ArrayList<>();
                 for (User user : db.getUsers()){
-                    if(user.getUserTag().contains(searchTerm)){
+                    if (user.getUserTag().toLowerCase().contains(searchTerm.toLowerCase())) {
                         list.add(user);
                     }
                 }
