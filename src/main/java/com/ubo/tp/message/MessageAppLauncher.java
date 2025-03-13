@@ -24,9 +24,7 @@ public class MessageAppLauncher {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-
 		IDatabase database = new Database();
-
 		EntityManager entityManager = new EntityManager(database);
 
 		if (IS_MOCK_ENABLED) {
@@ -35,8 +33,7 @@ public class MessageAppLauncher {
 		}
 
 		MessageApp messageApp = new MessageApp(database, entityManager);
-		messageApp.init();
-		messageApp.show();
-
+		// Utiliser la classe interne pour lancer avec JavaFX
+		MessageApp.MessageAppFX.launchApp(messageApp);
 	}
 }

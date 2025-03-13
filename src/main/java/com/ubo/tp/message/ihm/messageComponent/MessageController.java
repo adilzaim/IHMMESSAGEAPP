@@ -2,9 +2,7 @@ package com.ubo.tp.message.ihm.messageComponent;
 
 import com.ubo.tp.message.core.EntityManager;
 import com.ubo.tp.message.core.database.IDatabase;
-import com.ubo.tp.message.core.database.IDatabaseObserver;
 import com.ubo.tp.message.datamodel.Message;
-import com.ubo.tp.message.datamodel.User;
 import com.ubo.tp.message.ihm.MessageAppMainView;
 import com.ubo.tp.message.ihm.userComponent.UserModel;
 
@@ -36,7 +34,10 @@ public class MessageController  {
         this.listener = new MessageListener() {
             @Override
             public void onMessageSend(String tag, String content) {
-                messageService.createMessage(tag,content,entityManager);
+                boolean send = messageService.createMessage(tag,content,entityManager);
+                if(!send){
+                    messageView.showPopUp("Le message ne doit pas depasser 200 caractères");
+                }
             }
         };
     }

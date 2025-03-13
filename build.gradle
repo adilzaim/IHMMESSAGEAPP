@@ -1,5 +1,7 @@
 plugins {
     id 'java'
+    id 'application' // Ajoute cette ligne
+    id 'org.openjfx.javafxplugin' version '0.0.13' // Ajouter le plugin JavaFX
 }
 
 group = 'com.example'
@@ -9,20 +11,45 @@ java {
         languageVersion.set(JavaLanguageVersion.of(17)) // Forcer la compilation en Java 17
     }
 }
+
 repositories {
     mavenCentral()
 }
 
+// Configuration JavaFX
+javafx {
+    version = '17.0.2'
+    modules = ['javafx.controls', 'javafx.fxml', 'javafx.graphics']
+    // Ajouter javafx.swing si vous avez besoin de composants mixtes Swing/JavaFX pendant la transition
+}
+
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
+    // Si vous préférez ajouter manuellement les dépendances au lieu d'utiliser le plugin
+    // implementation 'org.openjfx:javafx-controls:17.0.2'
+    // implementation 'org.openjfx:javafx-fxml:17.0.2'
+    // implementation 'org.openjfx:javafx-graphics:17.0.2'
 }
+
 jar {
     manifest {
         attributes(
-                'Main-Class': 'main.java.com.ubo.tp.message.MessageAppLauncher' // Remplace avec ta classe principale
+                'Main-Class': 'com.ubo.tp.message.MessageAppLauncher' // Remplace avec ta classe principale
         )
     }
+
+    // Pour créer un jar exécutable avec toutes les dépendances
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+
+    // Cette option est nécessaire pour éviter les conflits de fichiers
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
+
 test {
     useJUnitPlatform()
+}
+application {
+    mainClass = 'com.ubo.tp.message.MessageAppLauncher'
 }

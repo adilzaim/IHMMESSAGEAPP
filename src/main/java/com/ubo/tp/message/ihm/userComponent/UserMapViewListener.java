@@ -1,7 +1,7 @@
 package com.ubo.tp.message.ihm.userComponent;
 
 import com.ubo.tp.message.ihm.searchUser.SearchUserView;
-import com.ubo.tp.message.ihm.ListUserComponent.MainView;
+import com.ubo.tp.message.ihm.searchUser.SearchUserView;
 
 public interface UserMapViewListener {
 

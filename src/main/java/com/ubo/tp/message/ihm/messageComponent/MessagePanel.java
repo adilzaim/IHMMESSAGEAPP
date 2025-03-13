@@ -1,67 +1,79 @@
 package com.ubo.tp.message.ihm.messageComponent;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+
 import java.util.List;
 
 import com.ubo.tp.message.datamodel.User;
 
-public class MessagePanel extends JPanel implements MessageModelObserver {
-    private JTextArea messageArea;
-    private JTextField inputField;
-    private JButton publishButton;
+public class MessagePanel extends BorderPane implements MessageModelObserver {
+    private TextArea messageArea;
+    private TextField inputField;
+    private Button publishButton;
     private User currentUser;
     private MessageListener messageListener;
     private MessageModel model;
-    private JScrollPane scrollPane;
 
     public MessagePanel(User currentUser, MessageModel model) {
         this.model = model;
         this.model.addObserver(this);
         this.currentUser = currentUser;
-        setLayout(new BorderLayout());
-        setPreferredSize(new Dimension(500, 300)); // Augmenté pour mieux voir les messages
 
-        // Zone d'affichage des messages avec bordure rouge
-        messageArea = new JTextArea(10, 30);
+        setPrefSize(500, 300); // Taille préférée pour le panneau
+
+        // Zone d'affichage des messages
+        messageArea = new TextArea();
         messageArea.setEditable(false);
+        messageArea.setPrefSize(480, 200);
         // Assurer une bonne visibilité du texte
-        messageArea.setBackground(Color.WHITE);
-        messageArea.setForeground(Color.GRAY);
-        messageArea.setFont(new Font("SansSerif", Font.ITALIC, 14));
+        messageArea.setStyle("-fx-control-inner-background: white;");
+        messageArea.setStyle("-fx-text-fill: gray;");
+        messageArea.setFont(Font.font("SansSerif", FontPosture.ITALIC, 14));
 
+        // Ajout de la TextArea avec le scrolling
+        ScrollPane scrollPane = new ScrollPane(messageArea);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setPrefSize(480, 200);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
 
-        scrollPane = new JScrollPane(messageArea);
-        // Assurons-nous que le JScrollPane est visible
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        scrollPane.setPreferredSize(new Dimension(480, 200));
-        add(scrollPane, BorderLayout.CENTER);
+        setCenter(scrollPane);
 
         // Zone de saisie + bouton publier
-        JPanel inputPanel = new JPanel(new BorderLayout());
-        inputField = new JTextField();
-        publishButton = new JButton("Publier");
+        HBox inputPanel = new HBox();
+        inputField = new TextField();
+        inputField.setPrefWidth(400);
+        publishButton = new Button("Publier");
 
-        inputPanel.add(inputField, BorderLayout.CENTER);
-        inputPanel.add(publishButton, BorderLayout.EAST);
-        add(inputPanel, BorderLayout.SOUTH);
+        inputPanel.getChildren().addAll(inputField, publishButton);
+        inputPanel.setPadding(new Insets(10));
+        inputPanel.setSpacing(10);
+
+        setBottom(inputPanel);
 
         // Action du bouton Publier
-        publishButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String text = inputField.getText().trim();
-                if (!text.isEmpty() && messageListener != null) {
-                    messageListener.onMessageSend(currentUser.getUserTag(), text);
-                    inputField.setText("");
-                }
+        publishButton.setOnAction(e -> {
+            String text = inputField.getText().trim();
+            // Vérifie si le message dépasse 200 caractères
+            if (text.length() > 200) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Message trop long");
+                alert.setHeaderText(null);
+                alert.setContentText("Le message ne doit pas dépasser 200 caractères.");
+                alert.showAndWait();
+                return; // Empêche l'envoi du message
+            }
+            if (!text.isEmpty() && messageListener != null) {
+                messageListener.onMessageSend(currentUser.getUserTag(), text);
+                inputField.setText("");
             }
         });
-
-        // Assurons-nous que le composant est visible
-        setVisible(true);
 
         // Initialisation des messages au démarrage
         initializeMessages();
@@ -77,64 +89,58 @@ public class MessagePanel extends JPanel implements MessageModelObserver {
      * Cette méthode est appelée une seule fois dans le constructeur
      */
     private void initializeMessages() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                // Récupérer la liste initiale des messages depuis le modèle
-                List<String> initialMessages = model.getCurrentList();
+        Platform.runLater(() -> {
+            // Récupérer la liste initiale des messages depuis le modèle
+            List<String> initialMessages = model.getCurrentList();
 
-                // Vider la zone de texte
-                messageArea.setText("");
+            // Vider la zone de texte
+            messageArea.setText("");
 
-                System.out.println("Initialisation des messages - Nombre: " +
-                        (initialMessages != null ? initialMessages.size() : 0));
+            System.out.println("Initialisation des messages - Nombre: " +
+                    (initialMessages != null ? initialMessages.size() : 0));
 
-                // Afficher chaque message dans la zone de texte
-                if (initialMessages != null && !initialMessages.isEmpty()) {
-                    for (String message : initialMessages) {
-                        System.out.println("Initialisation - Ajout du message: " + message);
-                        messageArea.append(message + "\n");
-                    }
-
-                    // Scroller vers le bas pour voir les derniers messages
-                    messageArea.setCaretPosition(messageArea.getDocument().getLength());
+            // Afficher chaque message dans la zone de texte
+            if (initialMessages != null && !initialMessages.isEmpty()) {
+                for (String message : initialMessages) {
+                    System.out.println("Initialisation - Ajout du message: " + message);
+                    messageArea.appendText(message + "\n");
                 }
 
-                // Forcer le rafraîchissement de l'interface
-                messageArea.revalidate();
-                messageArea.repaint();
-                scrollPane.revalidate();
-                scrollPane.repaint();
-                revalidate();
-                repaint();
+                // Scroller vers le bas pour voir les derniers messages
+                messageArea.positionCaret(messageArea.getText().length());
             }
         });
     }
 
     @Override
     public void onMessageListUpdated(List<String> updatedList) {
-        // Utiliser invokeLater pour garantir que les mises à jour de l'IHM se font sur l'EDT
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                // Effacer d'abord le contenu actuel
-                messageArea.setText("");
+        // Utiliser Platform.runLater pour garantir que les mises à jour de l'IHM se font sur le thread JavaFX
+        Platform.runLater(() -> {
+            // Effacer d'abord le contenu actuel
+            messageArea.setText("");
 
-                // Ajouter chaque message comme une nouvelle ligne
-                for (String message : updatedList) {
-                    System.out.println("Ajout du message: " + message); // Debug
-                    messageArea.append(message + "\n");
-                }
-
-                // Scroller vers le bas pour voir les derniers messages
-                messageArea.setCaretPosition(messageArea.getDocument().getLength());
-
-                // Forcer le rafraîchissement de l'interface
-                messageArea.revalidate();
-                messageArea.repaint();
-                scrollPane.revalidate();
-                scrollPane.repaint();
+            // Ajouter chaque message comme une nouvelle ligne
+            for (String message : updatedList) {
+                System.out.println("Ajout du message: " + message); // Debug
+                messageArea.appendText(message + "\n");
             }
+
+            // Scroller vers le bas pour voir les derniers messages
+            messageArea.positionCaret(messageArea.getText().length());
         });
+    }
+
+    public void showPopUp(String message) {
+        // Make sure to run on JavaFX application thread
+        if (!Platform.isFxApplicationThread()) {
+            Platform.runLater(() -> showPopUp(message));
+            return;
+        }
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Information");
+        alert.setHeaderText(null); // No header text
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

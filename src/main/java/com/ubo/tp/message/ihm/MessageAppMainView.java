@@ -1,36 +1,45 @@
 package com.ubo.tp.message.ihm;
 
-import com.ubo.tp.message.ihm.searchUser.SearchUserView;
-import com.ubo.tp.message.datamodel.User;
 import com.ubo.tp.message.ihm.ListUserComponent.MainView;
-import com.ubo.tp.message.ihm.listener.ExitListener;
 import com.ubo.tp.message.ihm.messageComponent.MessagePanel;
+import com.ubo.tp.message.ihm.searchUser.SearchUserView;
+import com.ubo.tp.message.ihm.listener.ExitListener;
 import com.ubo.tp.message.ihm.userComponent.UserMapView;
 
-import javax.swing.*;
-import java.awt.*;
+
+import javafx.application.Platform;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
+
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
  * Classe de la vue principale de l'application.
  */
-public class MessageAppMainView extends JFrame {
+public class MessageAppMainView extends Stage {
 
     private String selectedDirectory; // Stocke le répertoire sélectionné
     private ExitListener exitListener;
     private LoginView component;
-    private JSplitPane mainSplitPane;
-    private JSplitPane bottomSplitPane;
-    private JPanel loginContainer;
+    private SplitPane mainSplitPane;
+    private SplitPane bottomSplitPane;
+    private BorderPane loginContainer;
     private MessagePanel messagePanel;
-    private JPanel rightBottomContainer;
-
-
+    private BorderPane rightBottomContainer;
 
     /**
      * Définit l'écouteur de sortie de l'application.
@@ -50,14 +59,15 @@ public class MessageAppMainView extends JFrame {
      * Initialise le composant de login.
      */
     private void initializeLoginComponent() {
-        loginContainer.add(component, BorderLayout.CENTER);
+        loginContainer.setCenter(component);
     }
 
     /**
      * Constructeur principal.
      */
     public MessageAppMainView(String directory, LoginView loginView) {
-        super("MessageApp - " + directory);
+        super();
+        setTitle("MessageApp - " + directory);
 
         this.component = loginView;
 
@@ -65,91 +75,99 @@ public class MessageAppMainView extends JFrame {
         setApplicationIcon();
 
         // Configuration de la fenêtre
-        setSize(800, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); // Centre la fenêtre
-
-        // Application d'un Look & Feel agréable
-        applyLookAndFeel();
-
-        // Ajout de la barre de menu
-        setJMenuBar(createMenuBar());
+        setWidth(800);
+        setHeight(600);
+        setOnCloseRequest(event -> {
+            if (exitListener != null) {
+                exitListener.onExit();
+            }
+        });
+        centerOnScreen(); // Centre la fenêtre
 
         // Initialisation du conteneur de login
-        loginContainer = new JPanel(new BorderLayout());
+        loginContainer = new BorderPane();
 
         // Initialisation du conteneur bottom-right
-        rightBottomContainer = new JPanel(new BorderLayout());
+        rightBottomContainer = new BorderPane();
 
         // Initialisation du split pane horizontal pour le bas
-        bottomSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        bottomSplitPane.setLeftComponent(null);  // Message panel sera ajouté ici
-        bottomSplitPane.setRightComponent(rightBottomContainer);
-        bottomSplitPane.setResizeWeight(0.7);  // Message panel prendra 70% de la largeur
-        bottomSplitPane.setDividerLocation(500);
+        bottomSplitPane = new SplitPane();
+        bottomSplitPane.getItems().add(rightBottomContainer);
+        bottomSplitPane.setDividerPositions(0.7);  // Message panel prendra 70% de la largeur
 
         // Initialisation du split pane vertical principal
-        mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-        mainSplitPane.setTopComponent(loginContainer);
-        mainSplitPane.setBottomComponent(bottomSplitPane);
-        mainSplitPane.setResizeWeight(0.8); // La partie supérieure occupe 80% de l'espace
-        mainSplitPane.setDividerLocation(480); // Position initiale du diviseur
+        mainSplitPane = new SplitPane();
+        mainSplitPane.setOrientation(javafx.geometry.Orientation.VERTICAL);
+        mainSplitPane.getItems().addAll(loginContainer, bottomSplitPane);
+        mainSplitPane.setDividerPositions(0.8); // La partie supérieure occupe 80% de l'espace
+
+        // Créer la scène avec le menu
+        BorderPane root = new BorderPane();
+        root.setTop(createMenuBar());
+        root.setCenter(mainSplitPane);
+
+        Scene scene = new Scene(root);
+        setScene(scene);
 
         // Initialiser le composant de login
         initializeLoginComponent();
-
-        // Définir le split pane comme contenu principal
-        setContentPane(mainSplitPane);
-    }
-
-    /**
-     * Applique un Look & Feel plus moderne.
-     */
-    private void applyLookAndFeel() {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            System.err.println("⚠ Impossible de charger le Look & Feel.");
-        }
     }
 
     /**
      * Définit l'icône de l'application.
      */
     private void setApplicationIcon() {
-        ImageIcon iconURL = new ImageIcon("src/main/resources/images/logo_20.png");
-
-        if (iconURL.getImage() != null) {
-            setIconImage(iconURL.getImage());
+        File iconFile = new File("src/main/resources/images/logo_20.png");
+        if (iconFile.exists()) {
+            try {
+                Image icon = new Image(iconFile.toURI().toString());
+                getIcons().add(icon);
+            } catch (Exception e) {
+                System.err.println("⚠ Erreur : Impossible de charger l'icône de l'application.");
+            }
         } else {
-            System.err.println("⚠ Erreur : Impossible de charger l'icône de l'application.");
+            System.err.println("⚠ Erreur : Fichier d'icône introuvable.");
         }
     }
 
     /**
      * Crée la barre de menu de l'application.
      */
-    private JMenuBar createMenuBar() {
-        JMenuBar menuBar = new JMenuBar();
+    private MenuBar createMenuBar() {
+        MenuBar menuBar = new MenuBar();
 
         // Menu "Fichier"
-        JMenu fileMenu = new JMenu("Fichier");
-        JMenuItem exitItem = new JMenuItem("Quitter", new ImageIcon("src/main/resources/images/exitIcon_20.png"));
+        Menu fileMenu = new Menu("Fichier");
+        MenuItem exitItem = new MenuItem("Quitter");
+
+        // Ajouter une icône au menu quitter si possible
+        File iconFile = new File("src/main/resources/images/exitIcon_20.png");
+        if (iconFile.exists()) {
+            try {
+                ImageView imageView = new ImageView(new Image(iconFile.toURI().toString()));
+                imageView.setFitHeight(16);
+                imageView.setFitWidth(16);
+                exitItem.setGraphic(imageView);
+            } catch (Exception e) {
+                System.err.println("⚠ Erreur : Impossible de charger l'icône de quitter.");
+            }
+        }
+
         // Modification de l'action de quitter
-        exitItem.addActionListener(e -> {
+        exitItem.setOnAction(e -> {
             if (exitListener != null) {
                 exitListener.onExit();
             }
         });
-        fileMenu.add(exitItem);
-        menuBar.add(fileMenu);
+        fileMenu.getItems().add(exitItem);
+        menuBar.getMenus().add(fileMenu);
 
         // Menu "Aide"
-        JMenu helpMenu = new JMenu("?");
-        JMenuItem aboutItem = new JMenuItem("À propos");
-        aboutItem.addActionListener(e -> showAboutDialog());
-        helpMenu.add(aboutItem);
-        menuBar.add(helpMenu);
+        Menu helpMenu = new Menu("?");
+        MenuItem aboutItem = new MenuItem("À propos");
+        aboutItem.setOnAction(e -> showAboutDialog());
+        helpMenu.getItems().add(aboutItem);
+        menuBar.getMenus().add(helpMenu);
 
         return menuBar;
     }
@@ -158,36 +176,49 @@ public class MessageAppMainView extends JFrame {
      * Affiche la boîte de dialogue "À propos".
      */
     private void showAboutDialog() {
-        ImageIcon icon = new ImageIcon("src/main/resources/images/logo_50.png");
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("À propos");
+        alert.setHeaderText(null);
 
-        // Créer un JPanel pour contenir le texte
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        // Créer un label avec le texte centré
+        Label label = new Label("UBO M2-TILL\nDépartement Informatique");
+        label.setAlignment(Pos.CENTER);
 
-        // Créer un JLabel avec le texte centré
-        JLabel label = new JLabel("<html><div style='text-align: center;'>UBO M2-TILL<br>Département Informatique</div></html>");
-        label.setAlignmentX(Component.CENTER_ALIGNMENT);
+        // Ajouter une icône si possible
+        File iconFile = new File("src/main/resources/images/logo_50.png");
+        if (iconFile.exists()) {
+            try {
+                ImageView imageView = new ImageView(new Image(iconFile.toURI().toString()));
+                VBox content = new VBox(10, imageView, label);
+                content.setAlignment(Pos.CENTER);
+                alert.getDialogPane().setContent(content);
+            } catch (Exception e) {
+                alert.setContentText("UBO M2-TILL\nDépartement Informatique");
+            }
+        } else {
+            alert.setContentText("UBO M2-TILL\nDépartement Informatique");
+        }
 
-        // Ajouter le label au panel
-        panel.add(label);
-
-        // Afficher la boîte de dialogue avec le texte centré
-        JOptionPane.showMessageDialog(this, panel, "À propos", JOptionPane.INFORMATION_MESSAGE, icon);
+        alert.showAndWait();
     }
 
     /**
      * Ouvre un sélecteur de fichier pour choisir un répertoire.
      */
     private void chooseDirectory() {
-        JFileChooser chooser = new JFileChooser();
-        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        chooser.setDialogTitle("Sélectionnez un répertoire d'échange");
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Sélectionnez un répertoire d'échange");
 
-        int returnVal = chooser.showOpenDialog(this);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            selectedDirectory = chooser.getSelectedFile().getAbsolutePath();
-            JOptionPane.showMessageDialog(this, "Répertoire sélectionné : " + selectedDirectory,
-                    "Confirmation", JOptionPane.INFORMATION_MESSAGE);
+        File selectedDir = chooser.showDialog(this);
+        if (selectedDir != null) {
+            selectedDirectory = selectedDir.getAbsolutePath();
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Confirmation");
+            alert.setHeaderText(null);
+            alert.setContentText("Répertoire sélectionné : " + selectedDirectory);
+            alert.showAndWait();
+
             setTitle("MessageApp - " + selectedDirectory);
         }
     }
@@ -197,7 +228,11 @@ public class MessageAppMainView extends JFrame {
      */
     private void showDirectoryStructure() {
         if (selectedDirectory == null) {
-            JOptionPane.showMessageDialog(this, "Aucun répertoire sélectionné.", "Erreur", JOptionPane.ERROR_MESSAGE);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erreur");
+            alert.setHeaderText(null);
+            alert.setContentText("Aucun répertoire sélectionné.");
+            alert.showAndWait();
             return;
         }
 
@@ -207,14 +242,23 @@ public class MessageAppMainView extends JFrame {
                     .map(path -> formatPath(currentDir, path))
                     .collect(Collectors.joining("\n"));
 
-            JTextArea textArea = new JTextArea(structure, 20, 50);
+            TextArea textArea = new TextArea(structure);
             textArea.setEditable(false);
-            JScrollPane scrollPane = new JScrollPane(textArea);
+            textArea.setPrefRowCount(20);
+            textArea.setPrefColumnCount(50);
 
-            JOptionPane.showMessageDialog(this, scrollPane, "Structure du répertoire sélectionné", JOptionPane.INFORMATION_MESSAGE);
+            Dialog<Void> dialog = new Dialog<>();
+            dialog.setTitle("Structure du répertoire sélectionné");
+            dialog.getDialogPane().setContent(textArea);
+            dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+            dialog.showAndWait();
+
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Erreur lors de la lecture du répertoire", "Erreur",
-                    JOptionPane.ERROR_MESSAGE);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erreur");
+            alert.setHeaderText(null);
+            alert.setContentText("Erreur lors de la lecture du répertoire");
+            alert.showAndWait();
         }
     }
 
@@ -229,16 +273,14 @@ public class MessageAppMainView extends JFrame {
     /**
      * Sélectionne un répertoire au démarrage de l'application.
      */
-    public static String chooseDirectoryOnStartup() {
-        JFileChooser chooser = new JFileChooser();
-        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        chooser.setDialogTitle("Sélectionnez un répertoire de travail");
 
-        int returnVal = chooser.showOpenDialog(null);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            return chooser.getSelectedFile().getAbsolutePath();
-        }
-        return null; // Retourne null si l'utilisateur annule
+
+    public static String chooseDirectoryOnStartup() {
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Sélectionnez un répertoire de travail");
+
+        File selectedDir = chooser.showDialog(null); // `null` peut être utilisé mais pas recommandé, voir explication plus bas
+        return (selectedDir != null) ? selectedDir.getAbsolutePath() : null;
     }
 
 
@@ -247,20 +289,15 @@ public class MessageAppMainView extends JFrame {
      */
     public void setLoginView() {
         // Revenir à la vue de login
-        loginContainer.removeAll();
-        loginContainer.add(component, BorderLayout.CENTER);
+        loginContainer.setCenter(component);
 
         // Supprimer le panel de messages s'il existe
-        if (messagePanel != null) {
-            bottomSplitPane.setLeftComponent(null);
+        if (messagePanel != null && bottomSplitPane.getItems().contains(messagePanel)) {
+            bottomSplitPane.getItems().remove(messagePanel);
         }
 
         // Supprimer le composant de droite s'il existe
-        rightBottomContainer.removeAll();
-
-        // Forcer la mise à jour de l'affichage
-        revalidate();
-        repaint();
+        rightBottomContainer.setCenter(null);
     }
 
     /**
@@ -268,13 +305,8 @@ public class MessageAppMainView extends JFrame {
      */
     public void setUserMapView(UserMapView userMapView) {
         // Remplacer le contenu de la partie supérieure
-        loginContainer.removeAll();
-        loginContainer.add(userMapView, BorderLayout.CENTER);
-        // Forcer la mise à jour de l'affichage
-        revalidate();
-        repaint();
+        loginContainer.setCenter(userMapView);
     }
-
 
     /**
      * Définit la vue des messages.
@@ -283,50 +315,31 @@ public class MessageAppMainView extends JFrame {
         // Stocker la référence du panel de messages
         this.messagePanel = messagePanel;
 
-        // Ajouter le panel de messages dans la partie gauche inférieure
-        bottomSplitPane.setLeftComponent(messagePanel);
+        // S'assurer que le bottomSplitPane a au plus 2 éléments
+        if (bottomSplitPane.getItems().size() >= 2) {
+            bottomSplitPane.getItems().set(0, messagePanel);
+        } else {
+            bottomSplitPane.getItems().add(0, messagePanel);
+        }
 
         // Ajuster la position du diviseur pour montrer le panel de messages
-        bottomSplitPane.setDividerLocation(500);
-
-        // Forcer la mise à jour de l'affichage
-        revalidate();
-        repaint();
+        bottomSplitPane.setDividerPositions(0.7);
     }
 
     /**
      * Ajoute un composant à la zone bottom-right.
      */
-    public void setRightBottomComponent(JComponent component) {
-        rightBottomContainer.removeAll();
-        rightBottomContainer.add(component, BorderLayout.CENTER);
-
-        // Forcer la mise à jour de l'affichage
-        revalidate();
-        repaint();
+    public void setRightBottomComponent(Pane component) {
+        rightBottomContainer.setCenter(component);
     }
 
     public void setUserListView(MainView mainView) {
-        // Supprimer le composant existant dans la partie supérieure
-        loginContainer.removeAll();
-
         // Ajouter la vue des utilisateurs dans la partie supérieure
-        loginContainer.add(mainView, BorderLayout.CENTER);
-
-        // Forcer la mise à jour de l'affichage
-        revalidate();
-        repaint();
+        loginContainer.setCenter(mainView);
     }
 
     public void setSearchUser(SearchUserView searchUserView) {
-        // Supprimer le composant existant dans la partie supérieure
-        loginContainer.removeAll();
-
         // Ajouter la vue des utilisateurs dans la partie supérieure
-        loginContainer.add(searchUserView, BorderLayout.CENTER);
-
-        // Forcer la mise à jour de l'affichage
-        revalidate();
-        repaint();
+        loginContainer.setCenter(searchUserView);
     }
 }

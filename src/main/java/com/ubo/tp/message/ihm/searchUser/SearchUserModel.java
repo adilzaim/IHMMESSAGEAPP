@@ -1,11 +1,13 @@
 package com.ubo.tp.message.ihm.searchUser;
 
+import com.ubo.tp.message.core.database.IDatabaseObserver;
+import com.ubo.tp.message.datamodel.Message;
 import com.ubo.tp.message.datamodel.User;
 
 import java.util.ArrayList;
 import java.util.List;
 import com.ubo.tp.message.core.database.IDatabase;
-public class SearchUserModel {
+public class SearchUserModel implements IDatabaseObserver {
     private List<User> users;
     private List<SearchModelObserver> observers;
     private IDatabase db;
@@ -47,5 +49,39 @@ public class SearchUserModel {
 
     public List<User> getUsersModel() {
         return this.users;
+    }
+
+    @Override
+    public void notifyMessageAdded(Message addedMessage) {
+
+    }
+
+    @Override
+    public void notifyMessageDeleted(Message deletedMessage) {
+
+    }
+
+    @Override
+    public void notifyMessageModified(Message modifiedMessage) {
+
+    }
+
+    @Override
+    public void notifyUserAdded(User addedUser) {
+        List<User> list = new ArrayList<>();
+        for(User user : this.db.getUsers()){
+            list.add(user);
+        }
+        this.setUsers(list);
+    }
+
+    @Override
+    public void notifyUserDeleted(User deletedUser) {
+
+    }
+
+    @Override
+    public void notifyUserModified(User modifiedUser) {
+
     }
 }

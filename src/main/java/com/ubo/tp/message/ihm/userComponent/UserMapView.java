@@ -1,137 +1,133 @@
 package com.ubo.tp.message.ihm.userComponent;
 
 import com.ubo.tp.message.ihm.searchUser.SearchUserView;
+import com.ubo.tp.message.ihm.searchUser.SearchUserView;
 import com.ubo.tp.message.datamodel.User;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.geom.Ellipse2D;
-import java.awt.image.BufferedImage;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Circle;
+
 import java.io.File;
 
-public class UserMapView extends JPanel {
+public class UserMapView extends BorderPane {
 
-
-    // Map to store user information
+    // User information
     private User user;
 
     // Listener instance
     private UserMapViewListener listener;
     private SearchUserView searchUserView;
+
     /**
      * Constructor for UserMapView
-     * @param user  containing user information
+     * @param user containing user information
+     * @param searchUserView the search view
      */
-    public UserMapView(User user , SearchUserView searchUserView) {
+    public UserMapView(User user, SearchUserView searchUserView) {
         this.user = user;
         this.searchUserView = searchUserView;
-        // Set up the layout
-        setLayout(new BorderLayout());
 
         // Create main panel with user information
-        JPanel userInfoPanel = createUserInfoPanel(user);
-        add(userInfoPanel, BorderLayout.CENTER);
+        VBox userInfoPanel = createUserInfoPanel(user);
+        setCenter(userInfoPanel);
 
         // Create action buttons panel
-        JPanel actionPanel = createActionPanel();
-        add(actionPanel, BorderLayout.SOUTH);
+        HBox actionPanel = createActionPanel();
+        setBottom(actionPanel);
     }
 
     /**
      * Creates panel with user information
-     * @return JPanel with user details
+     * @return VBox with user details
      */
-    private JPanel createUserInfoPanel(User user) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    private VBox createUserInfoPanel(User user) {
+        VBox panel = new VBox(10); // 10px spacing between elements
+        panel.setPadding(new Insets(10));
+        panel.setAlignment(Pos.TOP_LEFT);
 
         // Avatar
         if (user.getAvatarPath() != null && !user.getAvatarPath().isEmpty()) {
-            ImageIcon icon = new ImageIcon(getCircularImage(user.getAvatarPath(), 80)); // Taille raisonnable (80px)
-            JLabel avatarLabel = new JLabel(icon);
-            avatarLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-            panel.add(avatarLabel);
+            try {
+                File file = new File(user.getAvatarPath());
+                Image image = new Image(file.toURI().toString());
+
+                // Create a circle for the avatar
+                Circle circle = new Circle(40); // 40px radius = 80px diameter
+                circle.setFill(new ImagePattern(image));
+
+                panel.getChildren().add(circle);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
-        // Informations utilisateur
-        panel.add(createInfoLabel("UUID", user.getUuid().toString()));
-        panel.add(createInfoLabel("Tag", user.getUserTag()));
-        panel.add(createInfoLabel("Nom", user.getName()));
-        panel.add(createInfoLabel("Mots de passe", user.getUserPassword()));
-        panel.add(createInfoLabel("Tags suivis", String.join(", ", user.getFollows())));
+        // User information
+        panel.getChildren().add(createInfoLabel("UUID", user.getUuid().toString()));
+        panel.getChildren().add(createInfoLabel("Tag", user.getUserTag()));
+        panel.getChildren().add(createInfoLabel("Nom", user.getName()));
+        panel.getChildren().add(createInfoLabel("Mots de passe", user.getUserPassword()));
+       // panel.getChildren().add(createInfoLabel("Tags suivis", String.join(", ", user.getFollows())));
 
         return panel;
     }
 
-    private JLabel createInfoLabel(String key, String value) {
-        JLabel label = new JLabel(key + ": " + value);
-        label.setAlignmentX(Component.LEFT_ALIGNMENT);
+    private Label createInfoLabel(String key, String value) {
+        Label label = new Label(key + ": " + value);
         return label;
     }
 
-    private Image getCircularImage(String imagePath, int size) {
-        try {
-            BufferedImage originalImage = ImageIO.read(new File(imagePath));
-            Image resizedImage = originalImage.getScaledInstance(size, size, Image.SCALE_SMOOTH);
-            BufferedImage circleBuffer = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
-
-            Graphics2D g2 = circleBuffer.createGraphics();
-            g2.setClip(new Ellipse2D.Float(0, 0, size, size));
-            g2.drawImage(resizedImage, 0, 0, null);
-            g2.dispose();
-
-            return circleBuffer;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-
-
     /**
      * Creates panel with action buttons
-     * @return JPanel with user action buttons
+     * @return HBox with user action buttons
      */
-    private JPanel createActionPanel() {
-        JPanel panel = new JPanel(new FlowLayout());
+    private HBox createActionPanel() {
+        HBox panel = new HBox(10); // 10px spacing between buttons
+        panel.setPadding(new Insets(10));
+        panel.setAlignment(Pos.CENTER);
 
         // Profile View Button
-        JButton profileButton = new JButton("Voir Profil");
-        profileButton.addActionListener(e -> {
+        Button profileButton = new Button("Voir Profil");
+        profileButton.setOnAction(e -> {
             if (listener != null) {
                 listener.onUserProfileView();
             }
         });
-        panel.add(profileButton);
+        panel.getChildren().add(profileButton);
 
         // User List Button
-        JButton userListButton = new JButton("Liste Utilisateurs");
-        userListButton.addActionListener(e -> {
+        Button userListButton = new Button("Liste Utilisateurs");
+        userListButton.setOnAction(e -> {
             if (listener != null) {
                 listener.onUserListView();
             }
         });
-        panel.add(userListButton);
+        panel.getChildren().add(userListButton);
 
         // Search Button
-        JButton searchButton = new JButton("Rechercher");
-        searchButton.addActionListener(e -> {
+        Button searchButton = new Button("Rechercher");
+        searchButton.setOnAction(e -> {
             if (listener != null) {
                 listener.onUserSearch(searchUserView);
             }
         });
-        panel.add(searchButton);
+        panel.getChildren().add(searchButton);
 
         // Logout Button
-        JButton logoutButton = new JButton("Déconnexion");
-        logoutButton.addActionListener(e -> {
+        Button logoutButton = new Button("Déconnexion");
+        logoutButton.setOnAction(e -> {
             if (listener != null) {
                 listener.onLogout();
             }
         });
-        panel.add(logoutButton);
+        panel.getChildren().add(logoutButton);
 
         return panel;
     }

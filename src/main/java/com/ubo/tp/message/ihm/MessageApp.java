@@ -20,22 +20,20 @@ import com.ubo.tp.message.ihm.messageComponent.MessageController;
 import com.ubo.tp.message.ihm.messageComponent.MessageModel;
 import com.ubo.tp.message.ihm.messageComponent.MessagePanel;
 import com.ubo.tp.message.ihm.serviceUser.Service;
-import com.ubo.tp.message.ihm.userComponent.UserController;
-import com.ubo.tp.message.ihm.userComponent.UserMapView;
-import com.ubo.tp.message.ihm.userComponent.UserModel;
-import com.ubo.tp.message.ihm.userComponent.UserModelObserver;
+import com.ubo.tp.message.ihm.userComponent.*;
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.stage.Stage;
 
 import static com.ubo.tp.message.ihm.LoginView.showPopup;
-
 import static com.ubo.tp.message.ihm.MessageAppMainView.chooseDirectoryOnStartup;
-
 
 /**
  * Classe principale l'application.
  *
  * @author S.Lucas
  */
-public class MessageApp implements IDatabaseObserver , UserModelObserver {
+public class MessageApp implements IDatabaseObserver, UserModelObserver {
 	/**
 	 * Base de données.
 	 */
@@ -70,6 +68,7 @@ public class MessageApp implements IDatabaseObserver , UserModelObserver {
 
 	private MessageAnnouncementView messageAnnouncementView;
 	private UserModel userModel;
+
 	/**
 	 * Constructeur.
 	 *
@@ -79,10 +78,9 @@ public class MessageApp implements IDatabaseObserver , UserModelObserver {
 	public MessageApp(IDatabase database, EntityManager entityManager) {
 		this.mDatabase = database;
 		this.mEntityManager = entityManager;
-		this.userService = new Service(this.mDatabase,this.mEntityManager);
+		this.userService = new Service(this.mDatabase, this.mEntityManager);
 		this.userModel = new UserModel();
 		this.userModel.addObserver(this);
-
 	}
 
 	/**
@@ -93,88 +91,69 @@ public class MessageApp implements IDatabaseObserver , UserModelObserver {
 		// Init du look and feel de l'application
 		this.initLookAndFeel();
 
-		// Initialisation de l'IHM
-		this.initGui();
-
-
+		// Initialisation du gui sera fait après le choix du répertoire
 	}
 
 	/**
 	 * Initialisation du look and feel de l'application.
 	 */
 	protected void initLookAndFeel() {
+		// Peut rester vide ou ajouter des styles JavaFX
 	}
 
 	/**
 	 * Initialisation de l'interface graphique.
 	 */
 	protected void initGui() {
-		// Choisir un répertoire d'échange (appel à la méthode existante)
-		this.initDirectory();
+		Platform.runLater(() -> {
+			String path = chooseDirectoryOnStartup();
 
+			if (path != null && this.isValideExchangeDirectory(new File(path))) {
+				System.out.println("Path found: " + path);
+				this.initDirectory(path);
 
+				// Création de la vue de connexion
+				LoginView loginView = new LoginView();
+				loginView.setLoginListener(new LoginListener() {
+					@Override
+					public void loginVerify(String username, String tag) {
+						doLogin(username, tag);
+					}
 
-	}
+					@Override
+					public void createUser(String name, String tag, String avatarPath, String password) {
+						createNewUser(name, tag, avatarPath, password, mEntityManager);
+					}
+				});
 
-	/**
-	 * Initialisation du répertoire d'échange (depuis la conf ou depuis un file
-	 * chooser). <br/>
-	 * <b>Le chemin doit obligatoirement avoir été saisi et être valide avant de
-	 * pouvoir utiliser l'application</b>
-	 */
-	protected void initDirectory() {
-		String path = chooseDirectoryOnStartup();
-	if(this.isValideExchangeDirectory(new File(path))) {
-		System.out.println("path found");
-		this.initDirectory(path);
-		LoginView loginView = new LoginView();
-		loginView.setLoginListener(new LoginListener() {
-			@Override
-			public void loginVerify(String username, String tag) {
-				 doLogin(username,tag);
-			}
-
-			@Override
-			public void createUser(String name, String tag, String avatarPath ,String password) {
-				createNewUser(name,tag, avatarPath,password,mEntityManager);
-
+				// Création de la vue principale
+				mMainView = new MessageAppMainView(path, loginView);
+				mMainView.setListener(() -> doQuit());
+				mMainView.show(); // Assurez-vous que cette méthode existe dans MessageAppMainView
+			} else {
+				System.out.println("Path not found or invalid!");
+				// Peut-être réessayer ou quitter proprement
+				System.exit(1);
 			}
 		});
-		mMainView = new MessageAppMainView(path,loginView);
-
-
-
-		mMainView.setListener(()-> doQuit());
-		mMainView.setVisible(true);
-
-	}else {
-		System.out.println("path not found");
 	}
 
-
+	protected void doQuit() {
+		System.exit(0);
 	}
 
-	protected void doQuit()
+	protected void doLogin(String name, String tag) {
+		User user = this.userService.doLogin(name, tag, this.userModel);
 
-	{
-
-			System.exit(0);
-
-	}
-
-	protected void doLogin(String name, String tag){
-		User user = this.userService.doLogin(name,tag,this.userModel);
-
-		if(user == null) {
-
-			showPopup("identifiants erroné", false);
+		if (user == null) {
+			showPopup("Identifiants erronés", false);
 		}
 	}
 
-	protected void createNewUser(String name, String tag , String path, String password, EntityManager mEntityManager){
-		if(!(this.userService.createUser(name,tag,path, password,mEntityManager))) showPopup("tag déja utilisé , choisisez un autre tag !", false);
-
-
+	protected void createNewUser(String name, String tag, String path, String password, EntityManager mEntityManager) {
+		if (!(this.userService.createUser(name, tag, path, password, mEntityManager))) {
+			showPopup("Tag déjà utilisé, choisissez un autre tag !", false);
+		}
 	}
 
 	/**
@@ -194,7 +173,6 @@ public class MessageApp implements IDatabaseObserver , UserModelObserver {
 	 * @param directoryPath
 	 */
 	protected void initDirectory(String directoryPath) {
-
 		mExchangeDirectoryPath = directoryPath;
 		mWatchableDirectory = new WatchableDirectory(directoryPath);
 		mEntityManager.setExchangeDirectory(directoryPath);
@@ -204,17 +182,17 @@ public class MessageApp implements IDatabaseObserver , UserModelObserver {
 	}
 
 	public void show() {
-
+		// Lancer l'initialisation de l'interface graphique
+		initGui();
 	}
 
 	@Override
 	public void notifyMessageAdded(Message addedMessage) {
 		System.out.println("---> Message ajouté : " + addedMessage.toString());
-		if(userModel.getCurrentUser() == null) return;
+		if (userModel.getCurrentUser() == null) return;
 		List<Message> liste = this.userService.getMessageUser(this.userModel.getCurrentUser());
 		this.messageAnnouncementView.unsetMessageList(liste);
 		this.mMainView.setRightBottomComponent(this.messageAnnouncementView);
-
 	}
 
 	@Override
@@ -247,38 +225,35 @@ public class MessageApp implements IDatabaseObserver , UserModelObserver {
 		ModelData modelData = new ModelData(this.mDatabase);
 		ListService service = new ListService(this.mDatabase);
 		service.initializeFollowLists(this.userModel.getCurrentUser(), modelData);
-		MainView mainView = new MainView(this.userModel.getCurrentUser(),modelData);
-		ListUserController listUserController = new ListUserController(userModel,mainView,modelData,service, this.userModel.getCurrentUser(),this.mDatabase);
+		MainView mainView = new MainView(this.userModel.getCurrentUser(), modelData);
+		ListUserController listUserController = new ListUserController(userModel, mainView, modelData, service, this.userModel.getCurrentUser(), this.mDatabase);
 		SearchUserModel modelSearch = new SearchUserModel(this.mDatabase);
 		SearchUserView viewSearchUser = new SearchUserView(modelSearch);
-		UserMapView userView = new UserMapView(this.userModel.getCurrentUser() ,viewSearchUser);
-        UserController userController = new UserController(this.userModel, this.mMainView , userView,mainView);
+		UserMapView userView = new UserMapView(this.userModel.getCurrentUser(), viewSearchUser);
+		UserController userController = new UserController(this.userModel, this.mMainView, userView, mainView);
 		this.messageAnnouncementView = new MessageAnnouncementView(this.userService.getMessageUser(this.userModel.getCurrentUser()));
-		MessageModel modelMessage = new MessageModel(this.mDatabase,this.userModel.getCurrentUser());
-		MessageController messageController = new MessageController(this.userModel , new MessagePanel(this.userModel.getCurrentUser(),modelMessage),this.mDatabase,this.mMainView,this.messageAnnouncementView,this.mEntityManager);
-		this.initializeListener(service , modelData, userView , mainView);
+		MessageModel modelMessage = new MessageModel(this.mDatabase, this.userModel.getCurrentUser());
+		MessageController messageController = new MessageController(this.userModel, new MessagePanel(this.userModel.getCurrentUser(), modelMessage), this.mDatabase, this.mMainView, this.messageAnnouncementView, this.mEntityManager);
+		this.initializeListener(service, modelData, userView, mainView);
 
-		ControllerSearch controllerSearch = new ControllerSearch(this.mDatabase , modelSearch , viewSearchUser , this.mMainView, userView);
-    }
+		ControllerSearch controllerSearch = new ControllerSearch(this.mDatabase, modelSearch, viewSearchUser, this.mMainView, userView);
+	}
 
-	private void initializeListener(ListService service, ModelData modelData , UserMapView userView , MainView mainView ) {
+	private void initializeListener(ListService service, ModelData modelData, UserMapView userView, MainView mainView) {
 		ListListener listListener = new ListListener() {
 			@Override
 			public void follow(User userToFollow) {
-				service.follow(userModel.getCurrentUser() , userToFollow ,modelData,mEntityManager);
+				service.follow(userModel.getCurrentUser(), userToFollow, modelData, mEntityManager);
 			}
 
 			@Override
 			public void unFollow(User userToUnFollow) {
-
-				service.unfollow(userModel.getCurrentUser() , userToUnFollow ,modelData, mEntityManager);
-
+				service.unfollow(userModel.getCurrentUser(), userToUnFollow, modelData, mEntityManager);
 			}
 
 			@Override
 			public void back() {
 				mMainView.setUserMapView(userView);
-
 			}
 		};
 		mainView.setListener(listListener);
@@ -287,5 +262,27 @@ public class MessageApp implements IDatabaseObserver , UserModelObserver {
 	@Override
 	public void onUserLoggedOut() {
 		this.mMainView.setLoginView();
+	}
+
+	/**
+	 * Classe interne pour gérer l'initialisation de JavaFX
+	 */
+	public static class MessageAppFX extends Application {
+		private static MessageApp messageApp;
+
+		public static void launchApp(MessageApp app) {
+			messageApp = app;
+			launch();
+		}
+
+		@Override
+		public void start(Stage primaryStage) {
+			// Initialiser JavaFX ici si nécessaire
+			// puis déléguer à MessageApp
+			if (messageApp != null) {
+				messageApp.init();
+				messageApp.show();
+			}
+		}
 	}
 }

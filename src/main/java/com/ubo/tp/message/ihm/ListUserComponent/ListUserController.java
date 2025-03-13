@@ -4,8 +4,8 @@ import com.ubo.tp.message.core.database.IDatabase;
 import com.ubo.tp.message.core.database.IDatabaseObserver;
 import com.ubo.tp.message.datamodel.Message;
 import com.ubo.tp.message.datamodel.User;
+
 import com.ubo.tp.message.ihm.MessageAppMainView;
-import com.ubo.tp.message.ihm.messageComponent.*;
 import com.ubo.tp.message.ihm.userComponent.UserModel;
 
 public class ListUserController implements IDatabaseObserver {

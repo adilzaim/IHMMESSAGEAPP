@@ -2,72 +2,71 @@ package com.ubo.tp.message.ihm.searchUser;
 
 import com.ubo.tp.message.datamodel.User;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import java.util.List;
 
 /**
- * Vue simplifiée pour la recherche d'utilisateurs.
- * Contient uniquement un champ de recherche, une liste et deux boutons.
+ * Vue simplifiée pour la recherche d'utilisateurs en JavaFX.
+ * Contient uniquement un champ de recherche, une liste et trois boutons.
  */
-public class SearchUserView extends JPanel implements SearchModelObserver {
-    private JTextField searchField;
-    private JButton searchButton;
-    private JButton resetButton;
-    private JList<User> resultsList;
+public class SearchUserView extends BorderPane implements SearchModelObserver {
+    private TextField searchField;
+    private Button searchButton;
+    private Button resetButton;
+    private ListView<User> resultsList;
     private SearchListener searchListener;
     private SearchUserModel model;
-    private JButton backButton; // Déclaration du bouton de retour
-
+    private Button backButton; // Déclaration du bouton de retour
 
     public SearchUserView(SearchUserModel model) {
         this.model = model;
         this.model.addObserver(this);
-        setLayout(new BorderLayout());
 
         // Panel supérieur contenant la barre de recherche et les boutons
-        JPanel searchPanel = new JPanel(new BorderLayout());
-        searchField = new JTextField();
-        searchButton = new JButton("Rechercher");
-        resetButton = new JButton("Réinitialiser");
-        // Création du bouton "Retour" et ajout à la partie inférieure
-        backButton = new JButton("Retour");
-        backButton.addActionListener(e -> searchListener.backTo());
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(searchButton);
-        buttonPanel.add(resetButton);
-        buttonPanel.add(backButton);
-        searchPanel.add(searchField, BorderLayout.CENTER);
-        searchPanel.add(buttonPanel, BorderLayout.EAST);
+        HBox searchPanel = new HBox(10); // 10px d'espacement
+        searchPanel.setPadding(new Insets(10));
 
+        searchField = new TextField();
+        searchField.setPrefWidth(300);
 
-        // Liste des résultats
-        resultsList = new JList<>(new DefaultListModel<>());
-        resultsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        searchButton = new Button("Rechercher");
+        resetButton = new Button("Réinitialiser");
+        backButton = new Button("Retour");
 
-        // Charger les utilisateurs initiaux
-        updateUserList(model.getUsersModel());
-
-        JScrollPane scrollPane = new JScrollPane(resultsList);
-
-        // Ajouter les composants au panel principal
-        add(searchPanel, BorderLayout.NORTH);
-        add(scrollPane, BorderLayout.CENTER);
-
-        // Actions des boutons
-        searchButton.addActionListener(e -> {
+        // Ajout des actions aux boutons
+        searchButton.setOnAction(e -> {
             if (searchListener != null) {
                 searchListener.onSearch(searchField.getText());
             }
         });
 
-        resetButton.addActionListener(e -> {
+        resetButton.setOnAction(e -> {
             searchField.setText("");
             if (searchListener != null) {
                 searchListener.reset();
             }
         });
+
+        backButton.setOnAction(e -> searchListener.backTo());
+
+        searchPanel.getChildren().addAll(searchField, searchButton, resetButton, backButton);
+
+        // Liste des résultats
+        resultsList = new ListView<>();
+        resultsList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+
+        // Charger les utilisateurs initiaux
+        updateUserList(model.getUsersModel());
+
+        // Configuration du layout principal
+        setTop(searchPanel);
+        setCenter(resultsList);
+        setPadding(new Insets(10));
     }
 
     public void setSearchListener(SearchListener listener) {
@@ -81,10 +80,10 @@ public class SearchUserView extends JPanel implements SearchModelObserver {
     }
 
     private void updateUserList(List<User> users) {
-        DefaultListModel<User> listModel = new DefaultListModel<>();
+        ObservableList<User> observableUsers = FXCollections.observableArrayList();
         if (users != null) {
-            users.forEach(listModel::addElement);
+            observableUsers.addAll(users);
         }
-        resultsList.setModel(listModel);
+        resultsList.setItems(observableUsers);
     }
 }

@@ -1,75 +1,89 @@
 package com.ubo.tp.message.ihm.ListUserComponent;
 
 import com.ubo.tp.message.datamodel.User;
-import javax.swing.*;
-import java.awt.*;
+
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+
+import java.io.File;
 import java.util.List;
 
-public class MainView extends JPanel implements ModelObserver {
+public class MainView extends BorderPane implements ModelObserver {
 
-    private JPanel leftPanel;
-    private JPanel rightPanel;
+    private VBox leftPanel;
+    private VBox rightPanel;
     private User currentUser;
     private ListListener listListener;
     private ModelData modelData;
-    private JButton backButton; // Déclaration du bouton de retour
+    private Button backButton; // Déclaration du bouton de retour
 
     public MainView(User currentUser, ModelData modelData) {
         this.modelData = modelData;
         this.modelData.addObserver(this);
         this.currentUser = currentUser;
-        setLayout(new BorderLayout());
 
         // Création des panneaux avec titre
-        JPanel leftContainerPanel = createTitledPanel("Utilisateurs disponibles");
-        JPanel rightContainerPanel = createTitledPanel("Utilisateurs suivis");
+        BorderPane leftContainerPanel = createTitledPanel("Utilisateurs disponibles");
+        BorderPane rightContainerPanel = createTitledPanel("Utilisateurs suivis");
 
         // Création des panneaux de contenu
-        leftPanel = new JPanel();
-        rightPanel = new JPanel();
+        leftPanel = new VBox();
+        leftPanel.setSpacing(5);
+        leftPanel.setPadding(new Insets(5));
 
-        // Utilisation du layout BoxLayout pour afficher les éléments
-        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
-        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+        rightPanel = new VBox();
+        rightPanel.setSpacing(5);
+        rightPanel.setPadding(new Insets(5));
 
         // Ajouter les panneaux de contenu aux panneaux avec titre
-        leftContainerPanel.add(new JScrollPane(leftPanel), BorderLayout.CENTER);
-        rightContainerPanel.add(new JScrollPane(rightPanel), BorderLayout.CENTER);
+        ScrollPane leftScrollPane = new ScrollPane(leftPanel);
+        leftScrollPane.setFitToWidth(true);
+        leftContainerPanel.setCenter(leftScrollPane);
 
-        // Créer un panneau central pour contenir les deux panneaux avec un diviseur
-        JSplitPane splitPane = new JSplitPane(
-                JSplitPane.HORIZONTAL_SPLIT,
-                leftContainerPanel,
-                rightContainerPanel
-        );
-        splitPane.setDividerLocation(350); // Position initiale du diviseur
-        splitPane.setOneTouchExpandable(true); // Permet d'étendre un panneau avec un clic
+        ScrollPane rightScrollPane = new ScrollPane(rightPanel);
+        rightScrollPane.setFitToWidth(true);
+        rightContainerPanel.setCenter(rightScrollPane);
+
+        // Créer un SplitPane pour contenir les deux panneaux
+        SplitPane splitPane = new SplitPane();
+        splitPane.getItems().addAll(leftContainerPanel, rightContainerPanel);
+        splitPane.setDividerPositions(0.5); // Position initiale du diviseur à 50%
 
         // Ajouter le SplitPane à la fenêtre principale
-        add(splitPane, BorderLayout.CENTER);
+        setCenter(splitPane);
 
         // Création du bouton "Retour" et ajout à la partie inférieure
-        backButton = new JButton("Retour");
-        backButton.addActionListener(e -> onBackButtonClick());
+        backButton = new Button("Retour");
+        backButton.setOnAction(e -> onBackButtonClick());
 
-        JPanel bottomPanel = new JPanel(); // Panneau pour contenir le bouton retour
-        bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-        bottomPanel.add(backButton);
+        HBox bottomPanel = new HBox(); // Panneau pour contenir le bouton retour
+        bottomPanel.setAlignment(Pos.CENTER);
+        bottomPanel.setPadding(new Insets(10));
+        bottomPanel.getChildren().add(backButton);
 
         // Ajouter le panneau de retour en bas de la fenêtre
-        add(bottomPanel, BorderLayout.SOUTH);
+        setBottom(bottomPanel);
 
         // Remplir les listes avec les utilisateurs
         updateUserLists();
     }
 
     // Méthode pour créer un panneau avec titre
-    private JPanel createTitledPanel(String title) {
-        JPanel panel = new JPanel(new BorderLayout());
-        JLabel titleLabel = new JLabel(title, SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
-        panel.add(titleLabel, BorderLayout.NORTH);
+    private BorderPane createTitledPanel(String title) {
+        BorderPane panel = new BorderPane();
+        Label titleLabel = new Label(title);
+        titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+        titleLabel.setPadding(new Insets(5));
+        titleLabel.setMaxWidth(Double.MAX_VALUE);
+        titleLabel.setAlignment(Pos.CENTER);
+        panel.setTop(titleLabel);
         return panel;
     }
 
@@ -80,63 +94,65 @@ public class MainView extends JPanel implements ModelObserver {
 
     // Met à jour les listes des utilisateurs dans les panneaux
     public void updateUserLists() {
-        leftPanel.removeAll();
-        rightPanel.removeAll();
+        Platform.runLater(() -> {
+            leftPanel.getChildren().clear();
+            rightPanel.getChildren().clear();
 
-        // Récupérer les utilisateurs non suivis
-        List<User> allUsers = modelData.getAllUserNotfollowed();
+            // Récupérer les utilisateurs non suivis
+            List<User> allUsers = modelData.getAllUserNotfollowed();
 
-        for (User user : allUsers) {
-            JPanel userPanel = createUserPanel(user, "Follow");
-            leftPanel.add(userPanel);
-            // Ajouter un séparateur entre chaque utilisateur
-            leftPanel.add(createSeparator());
-        }
+            for (User user : allUsers) {
+                HBox userPanel = createUserPanel(user, "Follow");
+                leftPanel.getChildren().add(userPanel);
+                // Ajouter un séparateur entre chaque utilisateur
+                leftPanel.getChildren().add(createSeparator());
+            }
 
-        // Récupérer les utilisateurs suivis
-        List<User> followedUsers = modelData.getFollowed();
+            // Récupérer les utilisateurs suivis
+            List<User> followedUsers = modelData.getFollowed();
 
-        for (User user : followedUsers) {
-            JPanel userPanel = createUserPanel(user, "Unfollow");
-            rightPanel.add(userPanel);
-            // Ajouter un séparateur entre chaque utilisateur
-            rightPanel.add(createSeparator());
-        }
-
-        // Revalidate et repaint pour mettre à jour l'affichage
-        leftPanel.revalidate();
-        leftPanel.repaint();
-        rightPanel.revalidate();
-        rightPanel.repaint();
+            for (User user : followedUsers) {
+                HBox userPanel = createUserPanel(user, "Unfollow");
+                rightPanel.getChildren().add(userPanel);
+                // Ajouter un séparateur entre chaque utilisateur
+                rightPanel.getChildren().add(createSeparator());
+            }
+        });
     }
 
     // Créer un séparateur horizontal
-    private JSeparator createSeparator() {
-        JSeparator separator = new JSeparator(JSeparator.HORIZONTAL);
-        separator.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+    private Separator createSeparator() {
+        Separator separator = new Separator();
+        separator.setMaxWidth(Double.MAX_VALUE);
         return separator;
     }
 
     // Crée un panneau pour afficher un utilisateur avec son avatar et son tag
-    private JPanel createUserPanel(User user, String buttonLabel) {
-        JPanel userPanel = new JPanel();
-        userPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        userPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+    private HBox createUserPanel(User user, String buttonLabel) {
+        HBox userPanel = new HBox(10); // Espacement de 10px entre les éléments
+        userPanel.setAlignment(Pos.CENTER_LEFT);
+        userPanel.setPadding(new Insets(5));
 
         // Charger l'avatar
-        ImageIcon avatarIcon = new ImageIcon(user.getAvatarPath());
-        // Redimensionner l'avatar pour une taille uniforme
-        Image image = avatarIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
-        avatarIcon = new ImageIcon(image);
-        JLabel avatarLabel = new JLabel(avatarIcon);
+        ImageView avatarView = new ImageView();
+        try {
+            Image avatarImage = new Image(new File(user.getAvatarPath()).toURI().toString());
+            avatarView.setImage(avatarImage);
+            avatarView.setFitWidth(40);
+            avatarView.setFitHeight(40);
+            avatarView.setPreserveRatio(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // Créer le tag de l'utilisateur
-        JLabel userTagLabel = new JLabel("@" + user.getUserTag());
-        userTagLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+        Label userTagLabel = new Label("@" + user.getUserTag());
+        userTagLabel.setPadding(new Insets(0, 10, 0, 10));
+        HBox.setHgrow(userTagLabel, Priority.ALWAYS); // Fait prendre tout l'espace disponible
 
         // Créer le bouton d'abonnement/désabonnement
-        JButton actionButton = new JButton(buttonLabel);
-        actionButton.addActionListener(e -> {
+        Button actionButton = new Button(buttonLabel);
+        actionButton.setOnAction(e -> {
             if (buttonLabel.equals("Follow")) {
                 this.listListener.follow(user);
             } else {
@@ -145,16 +161,13 @@ public class MainView extends JPanel implements ModelObserver {
         });
 
         // Ajouter les composants au panneau
-        userPanel.add(avatarLabel);
-        userPanel.add(userTagLabel);
-        userPanel.add(actionButton);
+        userPanel.getChildren().addAll(avatarView, userTagLabel, actionButton);
 
         return userPanel;
     }
 
     @Override
     public void update() {
-
         updateUserLists();
     }
 
